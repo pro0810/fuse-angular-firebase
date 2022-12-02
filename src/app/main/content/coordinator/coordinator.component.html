@@ -1,0 +1,216 @@
+<div id="coordinator" class="page-layout carded fullwidth" fusePerfectScrollbar>
+  <div class="top-bg mat-accent-bg"></div>
+  <div class="center">
+    <div
+      class="header white-fg"
+      fxLayout="row"
+      fxLayoutAlign="space-between center"
+    >
+      <div fxLayout="row" fxLayoutAlign="start center">
+        <button
+          class="mr-0 mr-sm-16"
+          mat-icon-button
+          [routerLink]="'/coordinators'"
+        >
+          <mat-icon>arrow_back</mat-icon>
+        </button>
+
+        <div
+          class="mr-8 mr-sm-16"
+          *fuseIfOnDom
+          [@animate]="{ value: '*', params: { delay: '50ms', scale: '0.2' } }"
+        >
+          <mat-icon
+            class="s-48 mat-icon material-icons"
+            role="img"
+            aria-hidden="true"
+            >business_center
+          </mat-icon>
+        </div>
+
+        <div
+          fxLayout="column"
+          fxLayoutAlign="start start"
+          *fuseIfOnDom
+          [@animate]="{ value: '*', params: { delay: '100ms', x: '-25px' } }"
+        >
+          <div class="h2" *ngIf="pageType === 'edit'">
+            {{ coordinator.name }}
+          </div>
+          <div class="h2" *ngIf="pageType === 'new'">
+            New Coordinator
+          </div>
+          <div class="subtitle secondary-text">
+            <span>Coordinator Detail</span>
+          </div>
+        </div>
+      </div>
+      <!-- / APP TITLE -->
+
+      <button
+        mat-raised-button
+        class="save-product-button mat-white-bg mt-16 mt-sm-0"
+        [disabled]="coordinatorForm.invalid || isSaving"
+        *ngIf="pageType === 'new'"
+        (click)="addCoordinator()"
+      >
+        <span>ADD</span>
+      </button>
+
+      <button
+        mat-raised-button
+        class="save-product-button mat-white-bg mt-16 mt-sm-0"
+        [disabled]="coordinatorForm.invalid || coordinatorForm.pristine"
+        *ngIf="pageType === 'edit'"
+        (click)="saveCoordinator()"
+      >
+        <span>SAVE</span>
+      </button>
+    </div>
+    <!-- / HEADER -->
+
+    <!-- CONTENT CARD -->
+    <div class="content-card mat-white-bg">
+      <mat-progress-bar
+        mode="indeterminate"
+        [color]="'warn'"
+        *ngIf="isSaving"
+      ></mat-progress-bar>
+      <!-- CONTENT -->
+      <div class="content">
+        <form
+          name="coordinatorForm"
+          [formGroup]="coordinatorForm"
+          class="product w-100-p"
+          fxLayout="column"
+          fxFlex
+        >
+          <mat-tab-group>
+            <mat-tab label="Coordinator Info" *ngIf="pageType === 'edit'">
+              <div class="tab-content p-24" fusePerfectScrollbar>
+                <mat-form-field class="w-100-p">
+                  <input
+                    matInput
+                    name="name"
+                    formControlName="name"
+                    placeholder="Coordinator Name"
+                    required
+                  />
+                </mat-form-field>
+
+                <mat-form-field class="w-100-p">
+                  <input
+                    matInput
+                    name="email"
+                    value="{{ coordinator.email }}"
+                    placeholder="Coordinator Email"
+                    disabled
+                    required
+                  />
+                </mat-form-field>
+
+                <mat-form-field class="w-100-p">
+                  <textarea
+                    matInput
+                    name="description"
+                    formControlName="description"
+                    placeholder="Coordinator Description"
+                    rows="5"
+                  >
+                  </textarea>
+                </mat-form-field>
+              </div>
+            </mat-tab>
+
+            <mat-tab label="Coordinator Info" *ngIf="pageType === 'new'">
+              <div class="tab-content p-24" fusePerfectScrollbar>
+                <mat-form-field class="w-100-p">
+                  <input matInput placeholder="Name" formControlName="name" />
+                  <mat-error *ngIf="registerFormErrors.name.required">
+                    Name is required
+                  </mat-error>
+                </mat-form-field>
+
+                <mat-form-field class="w-100-p">
+                  <input matInput placeholder="Email" formControlName="email" />
+                  <mat-error *ngIf="registerFormErrors.email.required">
+                    Email is required
+                  </mat-error>
+                  <mat-error
+                    *ngIf="
+                      !registerFormErrors.email.required &&
+                      registerFormErrors.email.email
+                    "
+                  >
+                    Please enter a valid email address
+                  </mat-error>
+                </mat-form-field>
+
+                <mat-form-field class="w-100-p">
+                  <input
+                    matInput
+                    type="password"
+                    placeholder="Password"
+                    formControlName="password"
+                  />
+                  <mat-error *ngIf="registerFormErrors.password.required">
+                    Password is required
+                  </mat-error>
+                  <mat-error *ngIf="registerFormErrors.password.minlength">
+                    Password must be at least 6 characters long.
+                  </mat-error>
+                </mat-form-field>
+
+                <mat-form-field class="w-100-p">
+                  <input
+                    matInput
+                    type="password"
+                    placeholder="Password (Confirm)"
+                    formControlName="passwordConfirm"
+                  />
+                  <mat-error
+                    *ngIf="registerFormErrors.passwordConfirm.required"
+                  >
+                    Password confirmation is required
+                  </mat-error>
+                  <mat-error
+                    *ngIf="registerFormErrors.passwordConfirm.passwordsNotMatch"
+                  >
+                    Passwords must match
+                  </mat-error>
+                </mat-form-field>
+
+                <mat-form-field class="w-100-p" *ngIf="isAdmin">
+                  <mat-select
+                    placeholder="Select Your Organization"
+                    formControlName="organization"
+                    [(ngModel)]="selectedOrg"
+                  >
+                    <mat-option *ngFor="let org of orgList" [value]="org">
+                      {{ org.name }}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+
+                <mat-form-field class="w-100-p" *ngIf="!isAdmin">
+                  <mat-select
+                    placeholder="Your Organization"
+                    formControlName="organization"
+                    [(ngModel)]="selectedOrg"
+                  >
+                    <mat-option *ngFor="let org of orgList" [value]="org">
+                      {{ org.name }}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+            </mat-tab>
+          </mat-tab-group>
+        </form>
+      </div>
+      <!-- / CONTENT -->
+    </div>
+    <!-- / CONTENT CARD -->
+  </div>
+  <!-- / CENTER -->
+</div>

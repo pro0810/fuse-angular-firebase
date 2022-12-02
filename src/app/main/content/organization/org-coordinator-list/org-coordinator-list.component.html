@@ -1,0 +1,109 @@
+<div class="tab-content p-24" fusePerfectScrollbar>
+                            
+    <!-- coordinators -->
+    <div class="black-fg"
+            fxLayout="column" fxLayoutAlign="center center"
+            fxLayout.gt-xs="row" fxLayoutAlign.gt-xs="space-between center">
+
+        <!-- SEARCH -->
+        <div class="search-input-wrapper mx-12 m-md-0"
+                fxFlex="1 0 auto" fxLayout="row" fxLayoutAlign="start center">
+            <label for="search" class="mr-8">
+                <mat-icon class="secondary-text" >search</mat-icon>
+            </label>
+            <mat-form-field floatPlaceholder="never" fxFlex="1 0 auto">
+                <input id="search" matInput #filter placeholder="Search">
+            </mat-form-field>
+        </div>
+        <!-- / SEARCH -->
+
+        <!-- <button mat-raised-button
+                (click)="addNewCoordinator()"
+                class="add-product-button mat-white-bg my-4 mt-sm-0">
+            <span>ADD NEW COORDINATOR</span>
+        </button> -->
+
+    </div>
+
+    <div class="content-card mat-white-bg">
+        <div class="toolbar px-24 py-8">
+            <div class="mail-selection" fxFlex="row" fxLayoutAlign="start center">
+                <button mat-button [matMenuTriggerFor]="selectMenu" class="text-capitalize">
+                    {{selectedCategory ? selectedCategory + ' Coordinators' : 'Select Category'}}
+                    <mat-icon>arrow_drop_down</mat-icon>
+                </button>
+                <mat-menu #selectMenu="matMenu">
+                    <button mat-menu-item class="text-capitalize" *ngFor="let category of categories" 
+                            (click)="filterByCategory(category)">{{category}} Coordinators</button>
+                </mat-menu>
+                
+                <div fxFlex="row" fxLayoutAlign="end center" *ngIf="!selection.isEmpty()">
+                    <div class="toolbar-separator"></div>
+    
+                    <button mat-button (click)="deleteSelected()" >
+                        <mat-icon>delete</mat-icon>
+                        Delete
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <mat-table class="coordinators-table"
+                        #table [dataSource]="coordinatordataSource"
+                        matSort
+                        [@animateStagger]="{value:'50'}" fusePerfectScrollbar>
+    
+                <ng-container cdkColumnDef="checkbox">
+                    <mat-header-cell *cdkHeaderCellDef>
+                        <mat-checkbox (change)="$event ? masterToggle() : null"
+                                    [checked]="isAllSelected()"
+                                    [indeterminate]="selection.hasValue() && !isAllSelected()"></mat-checkbox>
+                    </mat-header-cell>
+                    <mat-cell *cdkCellDef="let coordinator">
+                        <mat-checkbox (click)="$event.stopPropagation()"
+                                    (change)="$event ? selection.toggle(coordinator) : null"
+                                    [checked]="selection.isSelected(coordinator)"></mat-checkbox>
+                    </mat-cell>
+                </ng-container>
+    
+                <ng-container cdkColumnDef="photo">
+                    <mat-header-cell *cdkHeaderCellDef ></mat-header-cell>
+                    <mat-cell *cdkCellDef="let coordinator">
+                            <img class="avatar" [src]="coordinator.photo || 'assets/images/avatars/profile.jpg'"/>
+                    </mat-cell>
+                </ng-container>
+    
+                <ng-container cdkColumnDef="name">
+                    <mat-header-cell *cdkHeaderCellDef mat-sort-header>Name</mat-header-cell>
+                    <mat-cell *cdkCellDef="let coordinator" fxShow.gt-xs>
+                        <p class="text-truncate font-weight-600"> {{(coordinator.id | coordinator | async)?.name}}</p>
+                    </mat-cell>
+                </ng-container>
+    
+                <ng-container cdkColumnDef="email">
+                    <mat-header-cell *cdkHeaderCellDef fxShow.gt-xs>Email</mat-header-cell>
+                    <mat-cell *cdkCellDef="let coordinator" fxShow.gt-xs>
+                        <p class="text-truncate"> {{(coordinator.id | coordinator | async)?.email}} </p>
+                    </mat-cell>
+                </ng-container>
+    
+                <mat-header-row *cdkHeaderRowDef="coordinatorColumns"></mat-header-row>
+    
+                <mat-row *cdkRowDef="let coordinator; columns: coordinatorColumns;"
+                            class="coordinator"
+                            matRipple>
+                </mat-row>
+    
+            </mat-table>
+
+        <mat-paginator #paginator
+                        [length]="coordinatordataSource.filteredData.length"
+                        [pageIndex]="0"
+                        [pageSize]="10"
+                        [pageSizeOptions]="[5, 10, 25, 100]">
+        </mat-paginator>
+
+    </div>
+    <!-- /coordinators -->
+    
+</div>

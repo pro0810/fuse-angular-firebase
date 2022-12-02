@@ -1,0 +1,149 @@
+<div id="user" class="page-layout carded fullwidth" fusePerfectScrollbar>
+  <!-- TOP BACKGROUND -->
+  <div class="top-bg mat-accent-bg"></div>
+  <!-- / TOP BACKGROUND -->
+
+  <!-- CENTER -->
+  <div class="center">
+    <!-- HEADER -->
+    <div
+      class="header white-fg"
+      fxLayout="row"
+      fxLayoutAlign="space-between center"
+    >
+      <!-- APP TITLE -->
+      <div fxLayout="row" fxLayoutAlign="start center">
+        <button class="mr-0 mr-sm-16" mat-icon-button [routerLink]="'/users'">
+          <mat-icon>arrow_back</mat-icon>
+        </button>
+
+        <div *ngIf="pageType === 'new'" class="mr-8 mr-sm-16">
+          <mat-icon
+            class="s-48 mat-icon material-icons"
+            role="img"
+            aria-hidden="true"
+            >people</mat-icon
+          >
+        </div>
+        <div *ngIf="pageType === 'edit'" class="user-image mr-8 mr-sm-16">
+          <img [src]="user.photo || 'assets/images/avatars/profile.jpg'" />
+        </div>
+
+        <div
+          fxLayout="column"
+          fxLayoutAlign="start start"
+          *fuseIfOnDom
+          [@animate]="{ value: '*', params: { delay: '100ms', x: '-25px' } }"
+        >
+          <div class="h2" *ngIf="pageType === 'edit'">
+            {{ user.name }}
+          </div>
+          <div class="h2" *ngIf="pageType === 'new'">
+            New User
+          </div>
+          <div class="subtitle secondary-text">
+            <span>User Detail</span>
+          </div>
+        </div>
+      </div>
+      <!-- / APP TITLE -->
+
+      <button
+        mat-raised-button
+        class="save-product-button mat-white-bg mt-16 mt-sm-0"
+        [disabled]="userForm.invalid"
+        *ngIf="pageType === 'new' && selectedIndex == 0"
+        (click)="addUser()"
+      >
+        <span>ADD</span>
+      </button>
+
+      <button
+        mat-raised-button
+        class="save-product-button mat-white-bg mt-16 mt-sm-0"
+        [disabled]="!attachedFile"
+        *ngIf="pageType === 'new' && selectedIndex == 1"
+        (click)="uploadUser()"
+      >
+        <span>UPLOAD</span>
+      </button>
+    </div>
+    <!-- / HEADER -->
+
+    <!-- CONTENT CARD -->
+    <div class="content-card mat-white-bg">
+      <!-- CONTENT -->
+      <div class="content">
+        <form
+          name="userForm"
+          [formGroup]="userForm"
+          class="w-100-p"
+          fxLayout="column"
+          fxFlex
+        >
+          <mat-tab-group [(selectedIndex)]="selectedIndex">
+            <mat-tab label="User Info">
+              <div class="tab-content p-24" fusePerfectScrollbar>
+                <mat-form-field class="w-100-p">
+                  <input
+                    matInput
+                    name="name"
+                    formControlName="name"
+                    placeholder="User Name"
+                    required
+                  />
+                </mat-form-field>
+
+                <mat-form-field>
+                  <mat-select
+                    placeholder="Select Organization"
+                    formControlName="organization"
+                    [(ngModel)]="selectedOrg"
+                    (change)="onSelectOrg()"
+                    class="w-300"
+                  >
+                    <mat-option *ngFor="let org of orgList" [value]="org">
+                      {{ org.name }}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+
+                <mat-form-field class="w-100-p">
+                  <input
+                    matInput
+                    name="phone"
+                    formControlName="phone"
+                    placeholder="User Phone (ex.+1 801 448 9997)"
+                    (input)="onPhoneChange($event)"
+                    required
+                  />
+                  <span matPrefix>+&nbsp;</span>
+                  <mat-icon
+                    *ngIf="isValidPhone && phoneNumber"
+                    class="green-icon"
+                    matSuffix
+                    >check</mat-icon
+                  >
+                  <mat-icon
+                    *ngIf="!isValidPhone && phoneNumber"
+                    class="red-icon"
+                    matSuffix
+                    >close</mat-icon
+                  >
+                  <!-- <mat-error *ngIf="phone.valid">Invalid Phone Number</mat-error> -->
+                </mat-form-field>
+              </div>
+            </mat-tab>
+
+            <mat-tab *ngIf="pageType === 'new'" label="Bulk Users">
+              <app-bulk-user [orgId]="orgId"></app-bulk-user>
+            </mat-tab>
+          </mat-tab-group>
+        </form>
+      </div>
+      <!-- / CONTENT -->
+    </div>
+    <!-- / CONTENT CARD -->
+  </div>
+  <!-- / CENTER -->
+</div>

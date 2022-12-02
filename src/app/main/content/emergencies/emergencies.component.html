@@ -1,0 +1,305 @@
+<div id="emergencies" class="page-layout carded fullwidth" fusePerfectScrollbar>
+  <div class="top-bg mat-accent-bg"></div>
+  <div class="center">
+    <div
+      class="header white-fg"
+      fxLayout="column"
+      fxLayoutAlign="center center"
+      fxLayout.gt-xs="row"
+      fxLayoutAlign.gt-xs="space-between center"
+    >
+      <div
+        class="logo my-12 m-sm-0"
+        fxLayout="row"
+        fxLayoutAlign="start center"
+      >
+        <mat-icon
+          class="logo-icon mr-16"
+          *fuseIfOnDom
+          [@animate]="{ value: '*', params: { delay: '50ms', scale: '0.2' } }"
+          >local_hospital</mat-icon
+        >
+        <span
+          class="logo-text h1"
+          *fuseIfOnDom
+          [@animate]="{ value: '*', params: { delay: '100ms', x: '-25px' } }"
+          >Emergencies</span
+        >
+      </div>
+      <div
+        class="search-input-wrapper mx-12 m-md-0"
+        fxFlex="1 0 auto"
+        fxLayout="row"
+        fxLayoutAlign="start center"
+      >
+        <label for="search" class="mr-8">
+          <mat-icon class="secondary-text">search</mat-icon>
+        </label>
+        <mat-form-field floatPlaceholder="never" fxFlex="1 0 auto">
+          <input id="search" matInput #filter placeholder="Search" />
+        </mat-form-field>
+      </div>
+      <button
+        mat-raised-button
+        aria-label="Add New"
+        (click)="$event.stopPropagation(); onClickNewEmergency()"
+        class="mat-white-bg my-12 mt-sm-0"
+      >
+        <span>ADD NEW EMERGENCY</span>
+      </button>
+    </div>
+    <div class="content-card mat-white-bg">
+      <div class="toolbar px-24 py-8">
+        <div class="mail-selection" fxFlex="row" fxLayoutAlign="start center">
+          <mat-menu #selectMenu="matMenu">
+            <button
+              mat-menu-item
+              class="text-capitalize"
+              *ngFor="let category of categories"
+              (click)="filterByCategory(category)"
+            >
+              {{ category }} Emergencies
+            </button>
+          </mat-menu>
+
+          <div
+            fxFlex="row"
+            fxLayoutAlign="end center"
+            *ngIf="!selection.isEmpty()"
+          >
+            <div class="toolbar-separator"></div>
+
+            <button mat-button (click)="deleteSelected()">
+              <mat-icon>delete</mat-icon>
+              Delete
+            </button>
+          </div>
+        </div>
+      </div>
+      <mat-table
+        class="emergencies-table"
+        #table
+        [dataSource]="dataSource"
+        matSort
+        [@animateStagger]="{ value: '50' }"
+        fusePerfectScrollbar
+      >
+        <ng-container cdkColumnDef="checkbox">
+          <mat-header-cell *cdkHeaderCellDef>
+            <mat-checkbox
+              (change)="$event ? masterToggle() : null"
+              [checked]="isAllSelected()"
+              [indeterminate]="selection.hasValue() && !isAllSelected()"
+            ></mat-checkbox>
+          </mat-header-cell>
+          <mat-cell *cdkCellDef="let emergency">
+            <mat-checkbox
+              (click)="$event.stopPropagation()"
+              (change)="$event ? selection.toggle(emergency) : null"
+              [checked]="selection.isSelected(emergency)"
+            ></mat-checkbox>
+          </mat-cell>
+        </ng-container>
+        <ng-container cdkColumnDef="status">
+          <mat-header-cell *cdkHeaderCellDef>Status</mat-header-cell>
+          <mat-cell *cdkCellDef="let emergency">
+            <span
+              *ngIf="emergency.active"
+              class="status-emergency text-truncate"
+              [ngClass]="'mat-red-500-bg'"
+            ></span>
+            <span
+              *ngIf="!emergency.active"
+              class="status-emergency text-truncate"
+              [ngStyle]="{ 'background-color': '#808285' }"
+            ></span>
+          </mat-cell>
+        </ng-container>
+        <ng-container cdkColumnDef="name">
+          <mat-header-cell *cdkHeaderCellDef mat-sort-header
+            >Name</mat-header-cell
+          >
+          <mat-cell *cdkCellDef="let emergency">
+            <a
+              class="text-truncate font-weight-600 cursor-pointer emg-color"
+              [routerLink]="'/emergencies/' + emergency.id"
+            >
+              {{ emergency.name }}</a
+            >
+          </mat-cell>
+        </ng-container>
+        <ng-container cdkColumnDef="description">
+          <mat-header-cell *cdkHeaderCellDef>Description</mat-header-cell>
+          <mat-cell *cdkCellDef="let emergency" fxShow.gt-xs>
+            <p class="text-truncate">{{ emergency.description }}</p>
+          </mat-cell>
+        </ng-container>
+        <ng-container cdkColumnDef="notified">
+          <mat-header-cell *cdkHeaderCellDef fxShow.gt-xs
+            >Notified</mat-header-cell
+          >
+          <mat-cell *cdkCellDef="let emergency" fxShow.gt-xs>
+            <span
+              class="status-indicator text-truncate"
+              [ngStyle]="{ 'background-color': '#f7941d' }"
+            ></span>
+            <p class="text-truncate" *ngIf="emergency.usersNotified">
+              {{ emergency.usersNotified.length }}
+            </p>
+            <p class="text-truncate" *ngIf="!emergency.usersNotified">0</p>
+          </mat-cell>
+        </ng-container>
+        <ng-container cdkColumnDef="IamOK">
+          <mat-header-cell *cdkHeaderCellDef fxShow.gt-xs
+            >I'm OK</mat-header-cell
+          >
+          <mat-cell *cdkCellDef="let emergency" fxShow.gt-xs>
+            <span
+              class="status-indicator text-truncate"
+              [ngStyle]="{ 'background-color': '#39b54a' }"
+            ></span>
+            <span *ngIf="emergency.usersReplied">{{
+              (emergency | IamOK | async)?.length || 0
+            }}</span>
+            <span *ngIf="!emergency.usersReplied">{{ 0 }}</span>
+          </mat-cell>
+        </ng-container>
+        <ng-container cdkColumnDef="need_help">
+          <mat-header-cell *cdkHeaderCellDef fxShow.gt-xs
+            >Need Help</mat-header-cell
+          >
+          <mat-cell *cdkCellDef="let emergency" fxShow.gt-xs>
+            <span
+              class="status-indicator text-truncate"
+              [ngClass]="'mat-red-500-bg'"
+            ></span>
+            <span *ngIf="emergency.usersReplied">{{
+              (emergency | needHelp | async)?.length || 0
+            }}</span>
+            <span *ngIf="!emergency.usersReplied">{{ 0 }}</span>
+          </mat-cell>
+        </ng-container>
+        <ng-container cdkColumnDef="acknow">
+          <mat-header-cell *cdkHeaderCellDef fxShow.gt-xs
+            >Acknowledged</mat-header-cell
+          >
+          <mat-cell *cdkCellDef="let emergency" fxShow.gt-xs>
+            <span
+              class="status-indicator text-truncate"
+              [ngStyle]="{ background: '#b11116' }"
+            ></span>
+            <span *ngIf="emergency.usersReplied">{{
+              (emergency | acknow | async)?.length || 0
+            }}</span>
+            <span *ngIf="!emergency.usersReplied">{{ 0 }}</span>
+          </mat-cell>
+        </ng-container>
+        
+        <ng-container cdkColumnDef="response">
+          <mat-header-cell *cdkHeaderCellDef fxShow.gt-xs
+            >No Response</mat-header-cell
+          >
+          <mat-cell *cdkCellDef="let emergency" fxShow.gt-xs>
+            <span
+              class="status-indicator text-truncate"
+              [ngClass]="'mat-grey-500-bg'"
+            ></span>
+            <p
+              class="text-truncate"
+              *ngIf="emergency.usersReplied && emergency.usersNotified"
+            >
+              {{
+                emergency.usersNotified.length -
+                  ((emergency | noresp | async)?.length || 0)
+              }}
+            </p>
+            <p
+              class="text-truncate"
+              *ngIf="!emergency.usersReplied && emergency.usersNotified"
+            >
+              {{ emergency.usersNotified.length }}
+            </p>
+            <p
+              class="text-truncate"
+              *ngIf="!emergency.usersReplied && !emergency.usersNotified"
+            >
+              {{ 0 }}
+            </p>
+          </mat-cell>
+        </ng-container>
+        <ng-container cdkColumnDef="startedAt">
+          <mat-header-cell *cdkHeaderCellDef mat-sort-header fxShow.gt-xs
+            >Started At</mat-header-cell
+          >
+          <mat-cell *cdkCellDef="let emergency" fxShow.gt-xs>
+            <!-- <p class="text-truncate"> {{emergency.startedAt | date:'medium'}} </p> -->
+            <p class="text-truncate">
+              {{ emergency.startedAt | date }} {{ " " }}
+              {{ emergency.startedAt | date: "HH:mm" }}
+            </p>
+          </mat-cell>
+        </ng-container>
+        <ng-container cdkColumnDef="endedAt">
+          <mat-header-cell *cdkHeaderCellDef mat-sort-header fxShow.gt-xs
+            >Ended At</mat-header-cell
+          >
+          <mat-cell *cdkCellDef="let emergency" fxShow.gt-xs>
+            <p
+              class="text-truncate"
+              *ngIf="!emergency.active && emergency.endedAt != 0"
+            >
+              {{ emergency.endedAt | date }} {{ " " }}
+              {{ emergency.endedAt | date: "HH:mm" }}
+            </p>
+            <p
+              class="text-truncate"
+              *ngIf="emergency.active || emergency.endedAt == 0"
+            >
+              {{ "----" }}
+            </p>
+          </mat-cell>
+        </ng-container>
+        <ng-container cdkColumnDef="actions">
+          <mat-header-cell *cdkHeaderCellDef fxShow.gt-md
+            >Actions</mat-header-cell
+          >
+          <mat-cell *cdkCellDef="let emergency" fxShow.gt-md>
+            <button
+              *ngIf="emergency.active"
+              mat-raised-button
+              aria-label="action"
+              (click)="onActions(emergency)"
+              class="mat-white-bg w-60"
+            >
+              <span>Stop</span>
+            </button>
+
+            <button
+              *ngIf="!emergency.active"
+              mat-raised-button
+              aria-label="action"
+              (click)="onActions(emergency)"
+              class="mat-white-bg w-60"
+            >
+              <span>Start</span>
+            </button>
+          </mat-cell>
+        </ng-container>
+        <mat-header-row *cdkHeaderRowDef="displayedColumns"></mat-header-row>
+        <mat-row
+          *cdkRowDef="let emergency; columns: displayedColumns"
+          class="emergency"
+        >
+        </mat-row>
+      </mat-table>
+      <mat-paginator
+        #paginator
+        [length]="dataSource.filteredData.length"
+        [pageIndex]="0"
+        [pageSize]="10"
+        [pageSizeOptions]="[5, 10, 25, 100]"
+      >
+      </mat-paginator>
+    </div>
+  </div>
+</div>

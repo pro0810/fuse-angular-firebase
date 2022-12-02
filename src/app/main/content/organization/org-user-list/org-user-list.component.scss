@@ -1,0 +1,50 @@
+@import "src/@fuse/scss/fuse";
+
+:host {
+
+    .header {
+
+        .search-input-wrapper {
+            max-width: 480px;
+        }
+
+    }
+
+    .users-table {
+        flex: 1 1 auto;
+        border-bottom: 1px solid rgba(0, 0, 0, .12);
+        overflow: auto;
+
+        .mat-header-row {
+            min-height: 64px;
+        }
+
+        .mat-header-cell {
+            overflow: visible;
+        }
+
+        .mat-cell {
+            min-width: 0;
+            display: flex;
+            align-items: center;
+            overflow: visible;
+        }
+
+        .mat-column-checkbox {
+            max-width: 54px;
+        }
+
+        .mat-column-photo {
+            flex: 0 1 64px;
+        }
+
+        .mat-column-appliedLoan {
+            flex: 0 1 60px;
+        }
+
+        .active-icon {
+            border-radius: 50%;
+        }
+    }
+
+}

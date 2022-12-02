@@ -1,0 +1,213 @@
+<div id="users" class="page-layout carded fullwidth" fusePerfectScrollbar>
+  <div class="top-bg mat-accent-bg"></div>
+  <div class="center">
+    <div
+      class="header white-fg"
+      fxLayout="column"
+      fxLayoutAlign="center center"
+      fxLayout.gt-xs="row"
+      fxLayoutAlign.gt-xs="space-between center"
+    >
+      <div
+        class="logo my-12 m-sm-0"
+        fxLayout="row"
+        fxLayoutAlign="start center"
+      >
+        <mat-icon
+          class="logo-icon mr-16"
+          *fuseIfOnDom
+          [@animate]="{ value: '*', params: { delay: '50ms', scale: '0.2' } }"
+          >people</mat-icon
+        >
+        <span
+          class="logo-text h1"
+          *fuseIfOnDom
+          [@animate]="{ value: '*', params: { delay: '100ms', x: '-25px' } }"
+          >Users</span
+        >
+      </div>
+      <!-- SEARCH -->
+      <div
+        class="search-input-wrapper mx-12 m-md-0"
+        fxFlex="1 0 auto"
+        fxLayout="row"
+        fxLayoutAlign="start center"
+      >
+        <label for="search" class="mr-8">
+          <mat-icon class="secondary-text">search</mat-icon>
+        </label>
+        <mat-form-field floatPlaceholder="never" fxFlex="1 0 auto">
+          <input id="search" matInput #filter placeholder="Search" />
+        </mat-form-field>
+      </div>
+      <!-- / SEARCH -->
+
+      <button
+        mat-raised-button
+        [routerLink]="'/users/new'"
+        class="add-product-button mat-white-bg my-12 mt-sm-0"
+      >
+        <span>ADD NEW USER</span>
+      </button>
+    </div>
+
+    <div class="content-card mat-white-bg">
+      <div class="toolbar px-24 py-8">
+        <div class="mail-selection" fxFlex="row" fxLayoutAlign="start center">
+          <mat-menu #selectMenu="matMenu">
+            <button
+              mat-menu-item
+              class="text-capitalize"
+              *ngFor="let category of categories"
+              (click)="filterByCategory(category)"
+            >
+              {{ category }} Users
+            </button>
+          </mat-menu>
+          <div
+            fxFlex="row"
+            fxLayoutAlign="end center"
+            *ngIf="!selection.isEmpty()"
+          >
+            <div class="toolbar-separator"></div>
+
+            <button mat-button (click)="deleteSelected()">
+              <mat-icon>delete</mat-icon>
+              Delete
+            </button>
+          </div>
+        </div>
+      </div>
+      <mat-table
+        class="users-table"
+        #table
+        [dataSource]="dataSource"
+        matSort
+        [@animateStagger]="{ value: '50' }"
+        fusePerfectScrollbar
+      >
+        <ng-container cdkColumnDef="checkbox">
+          <mat-header-cell *cdkHeaderCellDef>
+            <mat-checkbox
+              (change)="$event ? masterToggle() : null"
+              [checked]="isAllSelected()"
+              [indeterminate]="selection.hasValue() && !isAllSelected()"
+            ></mat-checkbox>
+          </mat-header-cell>
+          <mat-cell *cdkCellDef="let user">
+            <mat-checkbox
+              (click)="$event.stopPropagation()"
+              (change)="$event ? selection.toggle(user) : null"
+              [checked]="selection.isSelected(user)"
+            >
+            </mat-checkbox>
+          </mat-cell>
+        </ng-container>
+        <ng-container cdkColumnDef="photo">
+          <mat-header-cell *cdkHeaderCellDef></mat-header-cell>
+          <mat-cell *cdkCellDef="let user">
+            <img
+              class="avatar"
+              [src]="user?.photo || 'assets/images/avatars/profile.jpg'"
+            />
+          </mat-cell>
+        </ng-container>
+        <ng-container cdkColumnDef="name">
+          <mat-header-cell *cdkHeaderCellDef mat-sort-header
+            >Name</mat-header-cell
+          >
+          <mat-cell *cdkCellDef="let user" fxShow.gt-xs>
+            <a
+              class="text-truncate font-weight-600 cursor-pointer emg-color"
+              [routerLink]="'/users/' + user.id"
+            >
+              {{ user?.name }}</a
+            >
+          </mat-cell>
+        </ng-container>
+
+        <ng-container cdkColumnDef="org" *ngIf="isAdmin">
+          <mat-header-cell *cdkHeaderCellDef mat-sort-header
+            >Organization</mat-header-cell
+          >
+          <mat-cell *cdkCellDef="let user" fxShow.gt-xs>
+            <p class="phone text-truncate">
+              {{ (user?.belongsTo | organization | async)?.name }}
+            </p>
+          </mat-cell>
+        </ng-container>
+
+        <ng-container cdkColumnDef="phone">
+          <mat-header-cell *cdkHeaderCellDef fxShow.gt-xs
+            >Phone</mat-header-cell
+          >
+          <mat-cell *cdkCellDef="let user" fxShow.gt-xs>
+            <p class="phone text-truncate">{{ user?.phone }}</p>
+          </mat-cell>
+        </ng-container>
+
+        <ng-container cdkColumnDef="location">
+          <mat-header-cell *cdkHeaderCellDef fxShow.gt-xs
+            >Location</mat-header-cell
+          >
+          <mat-cell *cdkCellDef="let user" fxShow.gt-xs>
+            <p class="email text-truncate">
+              {{ user?.location.name || user?.location.addr || "" }}
+            </p>
+          </mat-cell>
+        </ng-container>
+
+        <ng-container cdkColumnDef="message">
+          <mat-header-cell *cdkHeaderCellDef fxShow.gt-xs
+            >Message</mat-header-cell
+          >
+          <mat-cell *cdkCellDef="let user">
+            <button
+              mat-icon-button
+              aria-label="Message"
+              (click)="$event.stopPropagation(); onSendMessage(user)"
+            >
+              <mat-icon
+                *ngIf="
+                  (user.id | chatRoom | async)?.unread == 0 ||
+                  !(user.id | chatRoom | async)?.unread
+                "
+              >
+                email</mat-icon
+              >
+              <mat-icon
+                *ngIf="(user.id | chatRoom | async)?.unread > 0"
+                class="red-icon"
+                >email</mat-icon
+              >
+            </button>
+          </mat-cell>
+        </ng-container>
+
+        <ng-container cdkColumnDef="enrolled">
+          <mat-header-cell *cdkHeaderCellDef fxShow.gt-xs
+            >Enrolled</mat-header-cell
+          >
+          <mat-cell *cdkCellDef="let user" fxShow.gt-xs>
+            <p class="enrolled text-truncate" *ngIf="user.enroll">Yes</p>
+            <p class="enrolled text-truncate" *ngIf="!user.enroll">No</p>
+          </mat-cell>
+        </ng-container>
+
+        <mat-header-row *cdkHeaderRowDef="displayedColumns"></mat-header-row>
+
+        <mat-row *cdkRowDef="let user; columns: displayedColumns" class="user">
+        </mat-row>
+      </mat-table>
+
+      <mat-paginator
+        #paginator
+        [length]="dataSource.filteredData.length"
+        [pageIndex]="0"
+        [pageSize]="10"
+        [pageSizeOptions]="[5, 10, 25, 100]"
+      >
+      </mat-paginator>
+    </div>
+  </div>
+</div>

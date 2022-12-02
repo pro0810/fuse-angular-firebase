@@ -1,0 +1,20 @@
+<div style="margin: 18px;" fxFlex fxLayout="column">
+  <div class="" fxLayout="row">
+    <mat-form-field fxFlex floatPlaceholder="never">
+      <textarea
+        matInput
+        placeholder="Send a message to all users"
+        [(ngModel)]="message"
+        rows="5"
+      ></textarea>
+    </mat-form-field>
+  </div>
+  <blockquote *ngFor="let message of messages">
+    <p (click)="updateMsg(message, message.content)">
+      {{ message.content }}
+    </p>
+    <footer>
+      {{ message.timestamp | date: "medium" }}, {{ message.sender.name }}
+    </footer>
+  </blockquote>
+</div>

@@ -1,0 +1,36 @@
+<div fxFlex fxLayout="column" fxLayoutAlign="center center">
+  <div
+    class="big-circle mat-elevation-z1 app-logo"
+    fxLayout="column"
+    fxLayoutAlign="center center"
+    *fuseIfOnDom
+    [@animate]="{ value: '*', params: { delay: '50ms', scale: '0.2' } }"
+  >
+    <mat-icon class="s-64 s-mat-128">chat</mat-icon>
+  </div>
+
+  <span
+    class="app-title my-24"
+    *fuseIfOnDom
+    [@animate]="{ value: '*', params: { delay: '100ms', y: '25px' } }"
+    >Chat App</span
+  >
+
+  <span
+    fxHide
+    fxShow.gt-md
+    class="app-message"
+    *fuseIfOnDom
+    [@animate]="{ value: '*', params: { delay: '200ms', y: '50px' } }"
+    >Select contact to start the chat!..</span
+  >
+
+  <button
+    mat-raised-button
+    fxHide.gt-md
+    class=""
+    fuseMatSidenavToggler="chat-left-sidenav"
+  >
+    Select contact to start the chat!..
+  </button>
+</div>

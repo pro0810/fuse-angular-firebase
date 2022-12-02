@@ -1,0 +1,23 @@
+<div id="chat" class="page-layout carded fullwidth">
+  <div class="top-bg mat-accent-bg"></div>
+  <div class="center">
+    <div class="content-card">
+      <mat-sidenav-container>
+        <app-chat-start *ngIf="!selectedChat"></app-chat-start>
+        <app-chat-view
+          *ngIf="selectedChat"
+          [getParamsData]="sendData"
+        ></app-chat-view>
+        <mat-sidenav
+          class="sidenav"
+          align="end"
+          opened="false"
+          mode="over"
+          fuseMatSidenavHelper="chat-right-sidenav"
+        >
+          <app-chat-right-sidenav></app-chat-right-sidenav>
+        </mat-sidenav>
+      </mat-sidenav-container>
+    </div>
+  </div>
+</div>

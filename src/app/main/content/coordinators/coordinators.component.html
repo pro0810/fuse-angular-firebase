@@ -1,0 +1,495 @@
+<div
+  id="coordinators"
+  class="page-layout carded fullwidth"
+  fusePerfectScrollbar
+>
+  <div class="top-bg mat-accent-bg"></div>
+  <div class="center">
+    <div
+      class="header white-fg"
+      fxLayout="column"
+      fxLayoutAlign="center center"
+      fxLayout.gt-xs="row"
+      fxLayoutAlign.gt-xs="space-between center"
+    >
+      <div
+        class="logo my-12 m-sm-0"
+        fxLayout="row"
+        fxLayoutAlign="start center"
+      >
+        <mat-icon
+          class="logo-icon mr-16"
+          *fuseIfOnDom
+          [@animate]="{ value: '*', params: { delay: '50ms', scale: '0.2' } }"
+          >business_center</mat-icon
+        >
+        <label *ngIf="selectedTabIndex == 0">
+          <span class="logo-text h1">Zones</span>
+        </label>
+        <label *ngIf="selectedTabIndex == 1">
+          <span class="logo-text h1">Coordinators</span>
+        </label>
+        <label *ngIf="selectedTabIndex == 2">
+          <span class="logo-text h1">Emergency Numbers</span>
+        </label>
+        <label *ngIf="selectedTabIndex == 3">
+          <span class="logo-text h1">Organization</span>
+        </label>
+      </div>
+      <div
+        class="search-input-wrapper mx-12 m-md-0"
+        fxFlex="1 0 auto"
+        fxLayout="row"
+        fxLayoutAlign="start center"
+        [hidden]="selectedTabIndex == 2"
+      >
+        <label for="search" class="mr-8">
+          <mat-icon class="secondary-text">search</mat-icon>
+        </label>
+        <!-- <ng-container *ngIf="selectedTabIndex == 1">
+          <mat-form-field floatPlaceholder="never" fxFlex="1 0 auto">
+            <input id="search" matInput #filter placeholder="Search" />
+          </mat-form-field>
+        </ng-container> -->
+        <!-- <ng-container *ngIf="selectedTabIndex == 0"> -->
+        <mat-form-field floatPlaceholder="never" fxFlex="1 0 auto">
+          <input
+            matInput
+            (keyup)="applyFilter($event.target.value)"
+            #filter
+            placeholder="Search"
+          />
+        </mat-form-field>
+        <!-- </ng-container> -->
+      </div>
+      <button
+        mat-raised-button
+        *ngIf="selectedTabIndex == 0"
+        [routerLink]="'/coordinators/add_zone'"
+        class="add-product-button mat-white-bg my-12 mt-sm-0"
+        [disabled]="isAdmin"
+      >
+        <span>ADD NEW ZONE</span>
+      </button>
+      <button
+        mat-raised-button
+        *ngIf="selectedTabIndex == 1"
+        [routerLink]="'/coordinators/new'"
+        class="add-product-button mat-white-bg my-12 mt-sm-0"
+      >
+        <span>ADD NEW COORDINATOR</span>
+      </button>
+      <button
+        mat-raised-button
+        *ngIf="selectedTabIndex == 3"
+        class="add-product-button mat-white-bg my-12 mt-sm-0"
+        (click)="onSaveLocation()"
+      >
+        <span>SAVE</span>
+      </button>
+      <button
+        mat-raised-button
+        *ngIf="selectedTabIndex == 2"
+        (click)="onSave()"
+        [disabled]="!epnForm || epnForm.invalid || epnForm.pristine"
+        class="add-product-button mat-white-bg my-12 mt-sm-0"
+      >
+        <span>SAVE</span>
+      </button>
+    </div>
+    <div class="content-card mat-white-bg">
+      <div class="toolbar px-24 py-8">
+        <div class="mail-selection" fxFlex="row" fxLayoutAlign="start center">
+          <mat-menu #selectMenu="matMenu">
+            <button
+              mat-menu-item
+              class="text-capitalize"
+              *ngFor="let category of categories"
+              (click)="filterByCategory(category)"
+            >
+              {{ category }} Users
+            </button>
+          </mat-menu>
+          <div
+            fxFlex="row"
+            fxLayoutAlign="end center"
+            *ngIf="!selection.isEmpty()"
+          >
+            <div class="toolbar-separator"></div>
+            <button
+              mat-button
+              (click)="deleteSelected()"
+              class="mat-white-bg my-12 mt-sm-0"
+            >
+              <mat-icon>delete</mat-icon>
+              Delete
+            </button>
+          </div>
+          <div
+            fxFlex="row"
+            fxLayoutAlign="end center"
+            *ngIf="!assemblySelection.isEmpty()"
+          >
+            <div class="toolbar-separator"></div>
+            <button
+              mat-button
+              (click)="deleteAssemblySelected()"
+              class="mat-white-bg my-12 mt-sm-0"
+            >
+              <mat-icon>delete</mat-icon>
+              Delete
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="content">
+        <mat-tab-group (selectedTabChange)="onLinkClick($event)">
+          <!-- TAB ONE ZONES -->
+          <mat-tab label="Zones">
+            <div fxLayout="row">
+              <div class="tab-content w-80-p p-12" fxLayout="column">
+                <mat-table
+                  class="zone-table"
+                  #table
+                  [dataSource]="dataSourcezone"
+                  [@animateStagger]="{ value: '50' }"
+                  fusePerfectScrollbar
+                >
+                  <ng-container cdkColumnDef="zone_checkbox">
+                    <mat-header-cell *cdkHeaderCellDef>
+                      <mat-checkbox
+                        (change)="$event ? masterToggle() : null"
+                        [checked]="isAllSelected()"
+                        [indeterminate]="
+                          selection.hasValue() && !isAllSelected()
+                        "
+                      >
+                      </mat-checkbox>
+                    </mat-header-cell>
+                    <mat-cell *cdkCellDef="let el">
+                      <mat-checkbox
+                        (click)="$event.stopPropagation()"
+                        (change)="onChange(el, el.zone_id)"
+                        [checked]="el.checked || selection.isSelected(el)"
+                      >
+                      </mat-checkbox>
+                    </mat-cell>
+                  </ng-container>
+                  <ng-container cdkColumnDef="zone_name">
+                    <mat-header-cell *cdkHeaderCellDef
+                      >Zone Name</mat-header-cell
+                    >
+                    <mat-cell *cdkCellDef="let el" fxShow.gt-xs>
+                      <a
+                        class="text-truncate font-weight-600 cursor-pointer emg-color"
+                        (click)="onChange(el, el.zone_id)"
+                      >
+                        {{ el.zone_name }}</a
+                      >
+                    </mat-cell>
+                  </ng-container>
+                  <ng-container cdkColumnDef="zone_description">
+                    <mat-header-cell *cdkHeaderCellDef
+                      >Zone Description</mat-header-cell
+                    >
+                    <mat-cell *cdkCellDef="let el" fxShow.gt-xs>
+                      {{ el.zone_description || "-" }}
+                    </mat-cell>
+                  </ng-container>
+                  <ng-container cdkColumnDef="organization">
+                    <mat-header-cell *cdkHeaderCellDef
+                      >Organization</mat-header-cell
+                    >
+                    <mat-cell *cdkCellDef="let el" fxShow.gt-xs>
+                      {{ (el.orgId | organization | async)?.name }}
+                    </mat-cell>
+                  </ng-container>
+                  <ng-container cdkColumnDef="assembly">
+                    <mat-header-cell *cdkHeaderCellDef
+                      >Assembly Points</mat-header-cell
+                    >
+                    <mat-cell *cdkCellDef="let el" fxShow.gt-xs>
+                      {{ (el.orgId | organization | async)?.name }}
+                    </mat-cell>
+                  </ng-container>
+                  <mat-header-row
+                    *cdkHeaderRowDef="displayedzoneColumns"
+                  ></mat-header-row>
+                  <mat-row
+                    *cdkRowDef="let row; columns: displayedzoneColumns"
+                    class="zone"
+                  >
+                  </mat-row>
+                </mat-table>
+                <mat-paginator
+                  [pageSizeOptions]="[5, 10, 20]"
+                  showFirstLastButtons
+                ></mat-paginator>
+              </div>
+              <div class="tab-content w-40-p p-12">
+                <div id="mapView" class="w-100-p h-600"></div>
+              </div>
+            </div>
+          </mat-tab>
+          <!-- TAB TWO CORDINATORS -->
+          <mat-tab label="Coordinators">
+            <mat-table
+              class="coordinators-table"
+              #table
+              [dataSource]="dataSource"
+              matSort
+              [@animateStagger]="{ value: '50' }"
+              fusePerfectScrollbar
+            >
+              <ng-container cdkColumnDef="checkbox">
+                <mat-header-cell *cdkHeaderCellDef>
+                  <mat-checkbox
+                    (change)="$event ? masterToggle() : null"
+                    [checked]="isAllSelected()"
+                    [indeterminate]="selection.hasValue() && !isAllSelected()"
+                  ></mat-checkbox>
+                </mat-header-cell>
+                <mat-cell *cdkCellDef="let coordinator">
+                  <!-- <mat-checkbox
+                    (click)="$event.stopPropagation()"
+                    (change)="onChange(coordinator, coordinator.zone_id)"
+                    [checked]="
+                      coordinator.checked || selection.isSelected(coordinator)
+                    "
+                  >
+                  </mat-checkbox> -->
+                </mat-cell>
+              </ng-container>
+              <ng-container cdkColumnDef="photo">
+                <mat-header-cell *cdkHeaderCellDef></mat-header-cell>
+                <mat-cell *cdkCellDef="let coordinator">
+                  <img
+                    class="avatar"
+                    [src]="
+                      coordinator.photo || 'assets/images/avatars/profile.jpg'
+                    "
+                  />
+                </mat-cell>
+              </ng-container>
+              <ng-container cdkColumnDef="name">
+                <mat-header-cell *cdkHeaderCellDef mat-sort-header
+                  >Name</mat-header-cell
+                >
+                <mat-cell *cdkCellDef="let coordinator" fxShow.gt-xs>
+                  <a
+                    class="text-truncate font-weight-600 cursor-pointer emg-color"
+                    [routerLink]="'/coordinators/' + coordinator.id"
+                  >
+                    {{ coordinator.name }}</a
+                  >
+                </mat-cell>
+              </ng-container>
+              <ng-container cdkColumnDef="org">
+                <mat-header-cell *cdkHeaderCellDef mat-sort-header fxShow.gt-xs
+                  >Organization
+                </mat-header-cell>
+                <mat-cell *cdkCellDef="let coordinator" fxShow.gt-xs>
+                  <p class="text-truncate">
+                    {{ (coordinator.belongsTo | organization | async)?.name }}
+                  </p>
+                </mat-cell>
+              </ng-container>
+              <ng-container cdkColumnDef="email">
+                <mat-header-cell *cdkHeaderCellDef fxShow.gt-xs
+                  >Email</mat-header-cell
+                >
+                <mat-cell *cdkCellDef="let coordinator" fxShow.gt-xs>
+                  <p class="phone text-truncate">{{ coordinator.email }}</p>
+                </mat-cell>
+              </ng-container>
+              <mat-header-row
+                *cdkHeaderRowDef="displayedColumns"
+              ></mat-header-row>
+              <mat-row
+                *cdkRowDef="let coordinator; columns: displayedColumns"
+                class="coordinator"
+              >
+              </mat-row>
+            </mat-table>
+            <mat-paginator
+              #paginator
+              [length]="dataSource.filteredData.length"
+              [pageIndex]="0"
+              [pageSize]="10"
+              [pageSizeOptions]="[5, 10, 25, 100]"
+            >
+            </mat-paginator>
+          </mat-tab>
+          <!-- TAB THREE EMERGENCY Numbers -->
+          <mat-tab label="Emergency Numbers" *ngIf="!isAdmin">
+            <div *ngIf="epnForm">
+              <form
+                name="epnForm"
+                [formGroup]="epnForm"
+                class="product w-100-p"
+                fxLayout="column"
+                fxFlex
+              >
+                <div class="tab-content p-24" fusePerfectScrollbar>
+                  <mat-form-field class="w-100-p">
+                    <input
+                      matInput
+                      name="localService"
+                      formControlName="localService"
+                      placeholder="Emergency Services Phone Number"
+                      (input)="onLocalPhoneChange($event)"
+                      required
+                    />
+                  </mat-form-field>
+                  <mat-form-field class="w-100-p">
+                    <input
+                      matInput
+                      name="coordPhone"
+                      formControlName="coordPhone"
+                      placeholder="Emergency Coordinator Phone Number (ex.+18002345670)"
+                      (input)="onPhoneChange($event)"
+                      required
+                    />
+                    <span matPrefix>+&nbsp;</span>
+                    <mat-icon *ngIf="isValidPhone" class="green-icon" matSuffix
+                      >check</mat-icon
+                    >
+                    <mat-icon *ngIf="!isValidPhone" class="red-icon" matSuffix
+                      >close</mat-icon
+                    >
+                  </mat-form-field>
+
+                  <mat-form-field class="w-100-p">
+                    <input
+                      matInput
+                      name="configOrgMin"
+                      formControlName="configOrgMin"
+                      placeholder="Send a SMS text message if user doesn't respond (mins)"
+                      (input)="onConfigOrgChange($event)"
+                      required
+                    />
+                  </mat-form-field>
+                </div>
+              </form>
+            </div>
+          </mat-tab>
+
+          <!-- Organization tab -->
+          <mat-tab label="Organization" *ngIf="!isAdmin || isAdmin" >
+            <div *ngIf="epnForm">
+              <form
+                name="epnForm"
+                [formGroup]="epnForm"
+                class="product w-100-p"
+                fxLayout="column"
+                fxFlex
+              >
+                <div class="tab-content p-24" fusePerfectScrollbar>              
+
+                  <div mat-dialog-content class="p-0 m-0" fusePerfectScrollbar>
+                    <agm-map class="w-100-p h-400" [zoom]="mapZoom" [latitude]="location.lat" [longitude]="location.lng" (centerChange)="centerChange($event)" (zoomChange)="zoomChange($event)">
+                        <agm-marker [latitude]="tempLocation.lat" [longitude]="tempLocation.lng">
+                        </agm-marker>
+                    </agm-map>
+                    <div style="margin-top: 10px;">
+                      Select the default location of your organization by moving the map. Click Save to update the default location.
+                    </div>
+                </div>
+                </div>
+              </form>
+            </div>
+          </mat-tab>
+
+<!-- Assembly point tab -->
+        
+          <mat-tab label="Assembly Point" *ngIf="!isAdmin" >
+            <div fxLayout="row">
+              <div class="tab-content w-50-p p-12" fxLayout="column">
+                <mat-table
+                  class="zone-table"
+                  #table
+                  [dataSource]="dataSourcezone"
+                  [@animateStagger]="{ value: '50' }"
+                  fusePerfectScrollbar
+                >
+                  <ng-container cdkColumnDef="zone_checkbox">
+                    <mat-header-cell *cdkHeaderCellDef>
+                      <mat-checkbox
+                        (change)="$event ? masterToggle() : null"
+                        [checked]="isAssemblyAllSelected()"
+                        [indeterminate]="
+                          assemblySelection.hasValue() && !isAssemblyAllSelected()
+                        "
+                      >
+                      </mat-checkbox>
+                    </mat-header-cell>
+                    <mat-cell *cdkCellDef="let el">
+                      <mat-checkbox
+                        (click)="$event.stopPropagation()"
+                        (change)="onAssemblyChange(el, el.zone_id)"
+                        [checked]="el.checked || assemblySelection.isSelected(el)"
+                      >
+                      </mat-checkbox>
+                    </mat-cell>
+                  </ng-container>
+                  <ng-container cdkColumnDef="zone_name">
+                    <mat-header-cell *cdkHeaderCellDef
+                      >Assembly Point</mat-header-cell
+                    >
+                    <mat-cell *cdkCellDef="let el">
+                    
+                        {{ el.zone_name }}
+                  
+                    </mat-cell>
+                  </ng-container>               
+                 
+                  <ng-container cdkColumnDef="assembly">
+                    <mat-header-cell *cdkHeaderCellDef
+                      >Assembly Points</mat-header-cell
+                    >
+                    <mat-cell *cdkCellDef="let el" fxShow.gt-xs>
+                      {{ (el.orgId | organization | async)?.name }}
+                    </mat-cell>
+                  </ng-container>
+                  <mat-header-row
+                    *cdkHeaderRowDef="displayedassembleColumns"
+                  ></mat-header-row>
+                  <mat-row
+                    *cdkRowDef="let row; columns: displayedassembleColumns"
+                    class="zone"
+                  >
+                  </mat-row>
+                </mat-table>
+              
+              </div>
+              <div class="tab-content w-50-p p-12">
+                <div *ngIf="epnForm">
+                  <form
+                    name="epnForm"
+                    [formGroup]="epnForm"
+                    class="product w-100-p"
+                    fxLayout="column"
+                    fxFlex
+                  >
+                    <div class="tab-content p-24" fusePerfectScrollbar>              
+    
+                      <div mat-dialog-content class="p-0 m-0" fusePerfectScrollbar>
+                        <agm-map class="w-100-p h-400" [zoom]="mapZoom" [latitude]="location.lat" [longitude]="location.lng" (centerChange)="centerChange($event)" (zoomChange)="zoomChange($event)">
+                            <agm-marker [latitude]="tempLocation.lat" [longitude]="tempLocation.lng">
+                            </agm-marker>
+                        </agm-map>
+                        <div style="margin-top: 10px;">
+                          Enter and Assembly Point name, Click on the map to position the Assembly Point
+                        </div>
+                    </div>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </mat-tab>
+        </mat-tab-group>
+      </div>
+    </div>
+  </div>
+</div>

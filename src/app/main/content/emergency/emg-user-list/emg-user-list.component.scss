@@ -1,0 +1,112 @@
+@import "src/@fuse/scss/fuse";
+
+:host {
+  .header {
+    .search-input-wrapper {
+      max-width: 480px;
+    }
+  }
+
+  .users-table {
+    flex: 1 1 auto;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+    overflow: auto;
+
+    .mat-cell:first-child {
+      padding-left: 10px;
+    }
+    .mat-header-cell:first-child {
+      padding-left: 10px;
+    }
+
+    .mat-header-row {
+      min-height: 64px;
+    }
+
+    .mat-header-cell {
+      overflow: visible;
+    }
+
+    .mat-cell {
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      overflow: visible;
+    }
+
+    .mat-column-checkbox {
+      max-width: 50px;
+    }
+
+    .mat-column-photo {
+      flex: 0 1 50px;
+    }
+
+    // .mat-column-phone {
+    //     max-width: 100px;
+    // }
+
+    .mat-column-name {
+      margin-left: 5px;
+    }
+
+    .mat-column-response {
+      max-width: 60px;
+    }
+
+    .mat-column-message {
+      max-width: 50px;
+    }
+
+    .mat-column-ack {
+      max-width: 100px;
+    }
+    .mat-column-status {
+      max-width: 140px;
+    }
+    .mat-select {
+      min-width: 110px !important;
+      max-width: 110px !important;
+      font-size: 13px;
+    }
+    .mat-checkbox {
+      margin: 0;
+    }
+
+    .active-icon {
+      border-radius: 50%;
+    }
+
+    .status-indicator {
+      display: inline-block;
+      vertical-align: middle;
+      width: 8px;
+      height: 8px;
+      border-radius: 4px;
+      margin-right: 8px;
+
+      & + span {
+        display: inline-block;
+        vertical-align: middle;
+      }
+    }
+
+    .status-indicator-bottom {
+      width: 8px;
+      height: 8px;
+      border-radius: 4px;
+      margin-right: 8px;
+
+      & + span {
+        display: inline-block;
+        position: absolute;
+        top: 28px;
+        left: 28px;
+      }
+    }
+
+    .red-icon {
+      color: red;
+    }
+  }
+}

@@ -1,0 +1,24 @@
+<div class="dialog-content-wrapper">
+
+    <mat-toolbar matDialogTitle class="emg-color-bg m-0">
+        <mat-toolbar-row>
+            <span class="title dialog-title">Default Location</span>
+        </mat-toolbar-row>
+    </mat-toolbar>
+
+    <div mat-dialog-content class="p-0 m-0" fusePerfectScrollbar>
+        <agm-map class="w-100-p h-400" [zoom]="mapZoom" [latitude]="location.lat" [longitude]="location.lng" (centerChange)="centerChange($event)" (zoomChange)="zoomChange($event)">
+            <agm-marker [latitude]="tempLocation.lat" [longitude]="tempLocation.lng">
+            </agm-marker>
+        </agm-map>
+    </div>
+
+    <div mat-dialog-actions class="m-0 p-5" fxLayout="row" fxLayoutAlign="space-between center">
+        <!-- <span style="padding-left: 10px;">{{tempLocation.lat}}, {{tempLocation.lng}}</span>   -->
+        <span style="padding-left: 10px;">Select the default location of your organization by moving the map.</span>
+        <button mat-button (click)="onOkay()" class="emg-color" style="margin-right: 15px;">
+          Okay
+    </button>
+    </div>
+
+</div>

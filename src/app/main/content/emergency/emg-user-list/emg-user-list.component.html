@@ -1,0 +1,293 @@
+<div class="tab-content p-8 pt-0" fusePerfectScrollbar>
+  <div
+    class="blac-fg"
+    fxLayout="column"
+    fxLayoutAlign="center center"
+    fxLayout.gt-xs="row"
+    fxLayoutAlign.gt-xs="space-between center"
+  >
+    <div
+      class="search-input-wrapper mx-12 m-md-0"
+      fxFlex="1 0 auto"
+      fxLayout="row"
+      fxLayoutAlign="start center"
+    >
+      <label for="search" class="mr-8">
+        <mat-icon class="secondary-text">search</mat-icon>
+      </label>
+      <mat-form-field floatPlaceholder="never" fxFlex="1 0 auto">
+        <input id="search" matInput #filter placeholder="Search" />
+      </mat-form-field>
+    </div>
+  </div>
+
+  <div class="content-card mat-blac-bg">
+    <mat-table
+      class="users-table"
+      #table
+      [dataSource]="dataSource"
+      matSort
+      [@animateStagger]="{ value: '50' }"
+      fusePerfectScrollbar
+    >
+      <ng-container cdkColumnDef="checkbox">
+        <mat-header-cell *cdkHeaderCellDef>
+          <mat-checkbox
+            (change)="$event ? masterToggle() : null"
+            [checked]="isAllSelected()"
+            [indeterminate]="selection.hasValue() && !isAllSelected()"
+          ></mat-checkbox>
+        </mat-header-cell>
+        <mat-cell *cdkCellDef="let user">
+          <mat-checkbox
+            (click)="$event.stopPropagation()"
+            (change)="$event ? userToggle(user) : null"
+            [checked]="selection.isSelected(user)"
+          ></mat-checkbox>
+        </mat-cell>
+      </ng-container>
+      <ng-container cdkColumnDef="photo">
+        <mat-header-cell *cdkHeaderCellDef></mat-header-cell>
+        <mat-cell *cdkCellDef="let user">
+          <div class="avatar-wrapper">
+            <img
+              [src]="user.photo || 'assets/images/avatars/profile.jpg'"
+              class="mat-avatar avatar"
+              alt="{{ user.name }}"
+            />
+          </div>
+        </mat-cell>
+      </ng-container>
+      <ng-container cdkColumnDef="name">
+        <mat-header-cell *cdkHeaderCellDef>Name</mat-header-cell>
+        <mat-cell *cdkCellDef="let user; let i = index">
+          <p class="phone text-truncate">
+            {{ user.name }}
+          </p>
+        </mat-cell>
+      </ng-container>
+      <ng-container cdkColumnDef="phone">
+        <mat-header-cell *cdkHeaderCellDef>Phone</mat-header-cell>
+        <mat-cell *cdkCellDef="let user">
+          <p class="phone text-truncate">
+            {{ (user.id | user | async)?.phone }}
+          </p>
+        </mat-cell>
+      </ng-container>
+      <ng-container cdkColumnDef="response">
+        <mat-header-cell *cdkHeaderCellDef>Response</mat-header-cell>
+        <mat-cell *cdkCellDef="let user">
+          <p
+            class="email text-truncate"
+            *ngIf="user.id | user: emergency.id | async as mUser"
+          >
+            {{ getSmsResponse(mUser) }}
+          </p>
+        </mat-cell>
+      </ng-container>
+      <ng-container cdkColumnDef="message">
+        <mat-header-cell *cdkHeaderCellDef fxShow.gt-xs></mat-header-cell>
+        <mat-cell *cdkCellDef="let user" fxLayoutAlign="center">
+          <button
+            mat-icon-button
+            aria-label="Message"
+            (click)="$event.stopPropagation(); onSendMessage(user)"
+          >
+            <mat-icon
+              *ngIf="
+                (user.id | chatRoom | async)?.unread == 0 ||
+                !(user.id | chatRoom | async)?.unread
+              "
+            >
+              email</mat-icon
+            >
+            <mat-icon
+              *ngIf="(user.id | chatRoom | async)?.unread > 0"
+              class="red-icon"
+              >email</mat-icon
+            >
+          </button>
+        </mat-cell>
+      </ng-container>
+      <ng-container cdkColumnDef="status">
+        <mat-header-cell *cdkHeaderCellDef>Status</mat-header-cell>
+        <mat-cell *cdkCellDef="let user">
+          <div fxFlex="row" fxLayoutAlign="start center" *ngIf="emergency">
+            <button
+              mat-icon-button
+              aria-label="status"
+              *ngIf="user.id | user: emergency.id | async as mUser"
+            >
+              <span
+                *ngIf="getUserRepliedStatus(mUser) == userStatus.NEED_HELP"
+                class="status-indicator text-truncate"
+                [ngClass]="'mat-red-500-bg'"
+              ></span>
+              <span
+                *ngIf="getUserRepliedStatus(mUser) == userStatus.NORMAL"
+                class="status-indicator text-truncate"
+                [ngClass]="'mat-green-500-bg'"
+              ></span>
+              <span
+                *ngIf="getUserRepliedStatus(mUser) == userStatus.ACKNOWLEDGED"
+                class="status-indicator text-truncate"
+                [ngClass]="'mat-red-500-bg'"
+              ></span>
+              <span
+                *ngIf="getUserRepliedStatus(mUser) == userStatus.NOT_RESPOND"
+                class="status-indicator text-truncate"
+                [ngClass]="'mat-grey-500-bg'"
+              >
+              </span>
+              <span
+                height="40px"
+                *ngIf="getUserRepliedStatus(mUser) == userStatus.NEED_HELP"
+              >
+                <mat-select
+                  placeholder=""
+                  [value]="1"
+                  (selectionChange)="onSelectStatus(mUser, $event.value)"
+                  [disabled]="!emergency.active"
+                >
+                  <mat-option
+                    *ngFor="let type of statusArray"
+                    [value]="type.id"
+                    [disabled]="type.id == 2"
+                  >
+                    {{ type.name }}</mat-option
+                  >
+                </mat-select>
+              </span>
+              <span
+                height="40px"
+                *ngIf="getUserRepliedStatus(mUser) == userStatus.NORMAL"
+              >
+                <mat-select
+                  placeholder=""
+                  [value]="0"
+                  (selectionChange)="onSelectStatus(mUser, $event.value)"
+                  [disabled]="!emergency.active"
+                >
+                  <mat-option
+                    *ngFor="let type of statusArray"
+                    [value]="type.id"
+                    [disabled]="type.id == 2"
+                  >
+                    {{ type.name }}</mat-option
+                  >
+                </mat-select>
+              </span>
+              <span
+                height="40px"
+                *ngIf="getUserRepliedStatus(mUser) == userStatus.ACKNOWLEDGED"
+              >
+                <mat-select
+                  placeholder=""
+                  [value]="3"
+                  (selectionChange)="onSelectStatus(mUser, $event.value)"
+                  [disabled]="!emergency.active"
+                >
+                  <mat-option
+                    *ngFor="let type of statusArray"
+                    [value]="type.id"
+                    [disabled]="type.id == 2"
+                  >
+                    {{ type.name }}</mat-option
+                  >
+                </mat-select>
+              </span>
+              <span
+                height="40px"
+                *ngIf="getUserRepliedStatus(mUser) == userStatus.NOT_RESPOND"
+              >
+                <mat-select
+                  placeholder=""
+                  [value]="2"
+                  (selectionChange)="
+                    onSelectStatusUnresponse(mUser, $event.value)
+                  "
+                  [disabled]="!emergency.active"
+                >
+                  <mat-option
+                    *ngFor="let type of statusArray"
+                    [value]="type.id"
+                    [disabled]="type.id == 2"
+                  >
+                    {{ type.name }}</mat-option
+                  >
+                </mat-select>
+              </span>
+            </button>
+          </div>
+        </mat-cell>
+      </ng-container>
+      <ng-container cdkColumnDef="ack">
+        <mat-header-cell *cdkHeaderCellDef>Acknowledge</mat-header-cell>
+        <mat-cell *cdkCellDef="let user">
+          <div fxFlex="row" fxLayoutAlign="center">
+            <button
+              mat-icon-button
+              aria-label="ack"
+              *ngIf="user.id | user: emergency.id | async as mUser"
+            >
+              <span *ngIf="getUserRepliedStatus(mUser) == userStatus.NEED_HELP">
+                <mat-checkbox
+                  (click)="onAcknowledge(mUser)"
+                  (change)="$event ? onAcknowledge(mUser) : null"
+                  [disabled]="!emergency.active"
+                >
+                </mat-checkbox>
+              </span>
+              <span
+                *ngIf="getUserRepliedStatus(mUser) == userStatus.ACKNOWLEDGED"
+              >
+                <mat-checkbox
+                  [checked]="true"
+                  [disabled]="!emergency.active"
+                ></mat-checkbox>
+              </span>
+            </button>
+          </div>
+        </mat-cell>
+      </ng-container>
+      <ng-container cdkColumnDef="alert" *ngIf="alert!==false">
+        <mat-header-cell *cdkHeaderCellDef >Alert Only</mat-header-cell >
+        <mat-cell *cdkCellDef="let user; let i = index">
+          <p class="phone text-truncate" >
+            Yes
+          </p>
+        </mat-cell>
+      </ng-container>
+      <ng-container cdkColumnDef="alert" *ngIf="alert!==true">
+        <mat-header-cell *cdkHeaderCellDef >Alert Only</mat-header-cell >
+          <mat-cell *cdkCellDef="let user; let i = index">
+            <p class="phone text-truncate" >
+              No
+            </p>
+          </mat-cell>
+      </ng-container>
+      <mat-header-row *cdkHeaderRowDef="displayedColumns"></mat-header-row>
+      <mat-row *cdkRowDef="let user; columns: displayedColumns" class="user">
+      </mat-row>
+    </mat-table>
+    <mat-paginator
+      #paginator
+      [length]="dataSource.filteredData.length"
+      [pageIndex]="0"
+      [pageSize]="10"
+      [pageSizeOptions]="[5, 10, 25, 100]"
+    >
+    </mat-paginator>
+    <ng-container *ngIf="emergency.type == 'USERS' && pageType == 'edit'">
+      <button
+        [disabled]="
+          !emergency.active || usersData.length === emergency.users.length
+        "
+        mat-raised-button
+        (click)="toggleMapAndList()"
+      >
+        ADD USER
+      </button>
+    </ng-container>
+  </div>
+</div>

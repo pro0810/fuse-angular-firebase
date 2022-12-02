@@ -1,0 +1,148 @@
+<div class="chat" fxFlex fxLayout="column">
+  <mat-toolbar class="chat-toolbar">
+    <div fxFlex fxLayout="row" fxLayoutAlign="space-between center">
+      <div fxLayout="row" fxLayoutAlign="start center">
+        <button class="mr-0 mr-sm-16" mat-icon-button (click)="onClickBack()">
+          <mat-icon>arrow_back</mat-icon>
+        </button>
+        <div
+          class="chat-contact"
+          fxLayout="row"
+          fxLayoutAlign="start center"
+          fuseMatSidenavToggler="chat-right-sidenav"
+          (click)="selectContact()"
+        >
+          <div class="avatar-wrapper">
+            <img
+              [src]="
+                (contact.id | user | async)?.photo ||
+                'assets/images/avatars/profile.jpg'
+              "
+              class="avatar"
+              alt="{{ (contact.id | user | async)?.name }}"
+            />
+          </div>
+          <div class="chat-contact-name">
+            {{ (contact.id | user | async)?.name }}
+          </div>
+        </div>
+      </div>
+      <div>
+        <button
+          mat-button
+          class="mat-icon-button"
+          [matMenuTriggerFor]="contactMenu"
+          aria-label="more"
+        >
+          <mat-icon>more_vert</mat-icon>
+        </button>
+
+        <mat-menu #contactMenu="matMenu">
+          <button
+            mat-menu-item
+            fuseMatSidenavToggler="chat-right-sidenav"
+            (click)="selectContact()"
+          >
+            Contact Info
+          </button>
+        </mat-menu>
+      </div>
+    </div>
+  </mat-toolbar>
+
+  <div id="chat-content" fxFlex fusePerfectScrollbar>
+    <div #scrollMe class="chat-messages">
+      <div
+        fxLayout="row"
+        *ngFor="let message of dialog"
+        class="message-row"
+        [ngClass]="{ user: message.sender.id === user.id }"
+      >
+        <img
+          *ngIf="message.sender.id === contact.id"
+          [src]="
+            (contact.id | user | async)?.photo ||
+            'assets/images/avatars/profile.jpg'
+          "
+          class="avatar"
+          alt="{{ (contact.id | user | async)?.name }}"
+        />
+
+        <img
+          *ngIf="message.sender.id === user.id"
+          class="avatar"
+          [src]="user.photo || 'assets/images/avatars/profile.jpg'"
+        />
+
+        <div class="bubble">
+          <mat-spinner
+            *ngIf="message.type == 1 && !message.media"
+            class="m-16"
+          ></mat-spinner>
+          <img
+            *ngIf="message.media"
+            class="message"
+            src="{{ message.media }}"
+          />
+          <agm-map
+            *ngIf="message.location"
+            class="w-300 h-200"
+            [zoom]="15"
+            [latitude]="message.location.lat"
+            [longitude]="message.location.lng"
+          >
+            <agm-marker
+              [latitude]="message.location.lat"
+              [longitude]="message.location.lng"
+            >
+            </agm-marker>
+          </agm-map>
+          <div class="message">{{ message.content }}</div>
+          <div class="time secondary-text">
+            {{ message.timestamp | date: "medium" }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="chat-footer" fxLayout="row" fxLayoutAlign="center center">
+    <form
+      #replyForm="ngForm"
+      (ngSubmit)="reply($event)"
+      (keyup.enter)="reply($event)"
+      fxFlex
+      class="reply-form"
+      fxLayout="row"
+      fxLayoutAlign="start center"
+    >
+      <input
+        hidden
+        id="photo"
+        type="file"
+        (change)="onFileChange($event)"
+        accept="image/*"
+        #fileInput
+      />
+      <button mat-icon-button class="mr-8" (click)="fileInput.click()">
+        <mat-icon>attach_file</mat-icon>
+      </button>
+      <mat-form-field class="" fxFlex floatPlaceholder="never">
+        <textarea
+          matInput
+          #replyInput
+          placeholder="Type and hit enter to send message"
+          ngModel
+          name="message"
+        ></textarea>
+      </mat-form-field>
+      <button
+        mat-fab
+        class="emg-color-bg"
+        type="submit"
+        aria-label="Send message"
+      >
+        <mat-icon>send</mat-icon>
+      </button>
+    </form>
+  </div>
+</div>

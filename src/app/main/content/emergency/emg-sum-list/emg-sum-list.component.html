@@ -1,0 +1,170 @@
+<div class="tab-content p-8 pt-0" fusePerfectScrollbar>
+  <div
+    class="blac-fg"
+    fxLayout="column"
+    fxLayoutAlign="center center"
+    fxLayout.gt-xs="row"
+    fxLayoutAlign.gt-xs="space-between center"
+  >
+    <div
+      class="search-input-wrapper mx-12 m-md-0"
+      fxFlex="1 0 auto"
+      fxLayout="row"
+      fxLayoutAlign="start center"
+    >
+      <label for="search" class="mr-8">
+        <mat-icon class="secondary-text">search</mat-icon>
+      </label>
+      <mat-form-field>
+        <input
+          matInput
+          (keyup)="applyFilter($event.target.value)"
+          placeholder="Filter"
+        />
+      </mat-form-field>
+    </div>
+  </div>
+  <div class="content-card mat-blac-bg">
+    <mat-table
+      class="emergencies-table"
+      #table
+      [dataSource]="dataSource"
+      [@animateStagger]="{ value: '50' }"
+      fusePerfectScrollbar
+    >
+      <ng-container cdkColumnDef="name">
+        <mat-header-cell *cdkHeaderCellDef>Name</mat-header-cell>
+        <mat-cell *cdkCellDef="let user">
+          <p class="phone text-truncate">{{ user.name }}</p>
+        </mat-cell>
+      </ng-container>
+      <ng-container cdkColumnDef="phone">
+        <mat-header-cell *cdkHeaderCellDef>Phone</mat-header-cell>
+        <mat-cell *cdkCellDef="let user">
+          <p class="phone text-truncate">
+            {{ (user.id | user | async)?.phone }}
+          </p>
+        </mat-cell>
+      </ng-container>
+      <ng-container cdkColumnDef="responded_time">
+        <mat-header-cell *cdkHeaderCellDef> Responded Time </mat-header-cell>
+        <mat-cell *cdkCellDef="let user; let i = index">
+          <p
+            class="email text-truncate"
+            [id]="user.id"
+            *ngIf="user.id | user: emergency.id | async as mUser"
+          >
+            {{ getAppResponse(mUser, i) }}
+          </p>
+        </mat-cell>
+      </ng-container>
+      <ng-container cdkColumnDef="response_lag">
+        <mat-header-cell *cdkHeaderCellDef> Response Lag</mat-header-cell>
+        <mat-cell *cdkCellDef="let user; let j = index">
+          <p class="phone text-truncate"></p>
+          <p
+            class="email text-truncate"
+            *ngIf="user.id | user: emergency.id | async as mUser"
+          >
+            {{ getResponseLag(mUser, j) }}
+          </p>
+        </mat-cell>
+      </ng-container>
+      <ng-container cdkColumnDef="response">
+        <mat-header-cell *cdkHeaderCellDef>Response</mat-header-cell>
+        <mat-cell *cdkCellDef="let user">
+          <p
+            class="email text-truncate"
+            *ngIf="user.id | user: emergency.id | async as mUser"
+          >
+            {{ getSmsResponse(mUser) }}
+          </p>
+        </mat-cell>
+      </ng-container>
+      <!-- <ng-container cdkColumnDef="message_sent">
+        <mat-header-cell *cdkHeaderCellDef>Message Sent</mat-header-cell>
+        <mat-cell *cdkCellDef="let user; let i = index">
+          <span *ngIf="emergency.usersNotified">
+            <p
+              class="email text-truncate"
+              *ngIf="user.id | user | async as mUser"
+            >
+              {{ checkIndividual(mUser) }}
+            </p>
+          </span>
+        </mat-cell>
+      </ng-container> -->
+      <ng-container cdkColumnDef="status">
+        <mat-header-cell *cdkHeaderCellDef>Status</mat-header-cell>
+        <mat-cell *cdkCellDef="let user">
+          <div fxFlex="row" fxLayoutAlign="start center" *ngIf="emergency">
+            <span
+              mat-icon-button
+              aria-label="status"
+              *ngIf="user.id | user: emergency.id | async as mUser"
+            >
+              <span
+                *ngIf="getUserRepliedStatus(mUser) == userStatus.NEED_HELP"
+                class="status-indicator text-truncate"
+                [ngClass]="'mat-red-500-bg'"
+              ></span>
+              <span
+                *ngIf="getUserRepliedStatus(mUser) == userStatus.NORMAL"
+                class="status-indicator text-truncate"
+                [ngClass]="'mat-green-500-bg'"
+              ></span>
+              <span
+                *ngIf="getUserRepliedStatus(mUser) == userStatus.ACKNOWLEDGED"
+                class="status-indicator text-truncate"
+                [ngClass]="'mat-red-500-bg'"
+              ></span>
+              <span
+                *ngIf="getUserRepliedStatus(mUser) == userStatus.NOT_RESPOND"
+                class="status-indicator text-truncate"
+                [ngClass]="'mat-grey-500-bg'"
+              ></span>
+
+              <span
+                height="40px"
+                *ngIf="getUserRepliedStatus(mUser) == userStatus.NEED_HELP"
+              >
+                <p class="phone text-truncate">NEED HELP</p>
+              </span>
+              <span
+                height="40px"
+                *ngIf="getUserRepliedStatus(mUser) == userStatus.NORMAL"
+              >
+                <p class="phone text-truncate">I'm OK</p>
+              </span>
+              <span
+                height="40px"
+                *ngIf="getUserRepliedStatus(mUser) == userStatus.ACKNOWLEDGED"
+              >
+                <p class="phone text-truncate">ACKNOWLEDGED</p>
+              </span>
+              <span
+                height="40px"
+                *ngIf="getUserRepliedStatus(mUser) == userStatus.NOT_RESPOND"
+              >
+                <p class="phone text-truncate">No Response</p>
+              </span>
+            </span>
+          </div>
+        </mat-cell>
+      </ng-container>
+      <mat-header-row *cdkHeaderRowDef="displayedColumns"></mat-header-row>
+      <mat-row *cdkRowDef="let user; columns: displayedColumns" class="user">
+      </mat-row>
+    </mat-table>
+    <!-- <mat-paginator
+      [pageSizeOptions]="[5, 10, 20]"
+      showFirstLastButtons
+    ></mat-paginator> -->
+    <!-- <mat-paginator #paginator
+                      [length]="dataSource.filteredData.length"
+                      [pageIndex]="0"
+                      [pageSize]="10"
+                      [pageSizeOptions]="[5, 10, 25, 100]">
+        </mat-paginator> -->
+  </div>
+</div>

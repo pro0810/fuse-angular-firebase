@@ -1,0 +1,75 @@
+<div class="tab-content p-8 pt-0" fusePerfectScrollbar>
+  <div
+    class="blac-fg"
+    fxLayout="column"
+    fxLayoutAlign="center center"
+    fxLayout.gt-xs="row"
+    fxLayoutAlign.gt-xs="space-between center"
+  >
+    <div
+      class="search-input-wrapper mx-12 m-md-0"
+      fxFlex="1 0 auto"
+      fxLayout="row"
+      fxLayoutAlign="start center"
+    >
+      <label for="search" class="mr-8">
+        <mat-icon class="secondary-text">search</mat-icon>
+      </label>
+      <mat-form-field floatPlaceholder="never" fxFlex="1 0 auto">
+        <input
+          id="search"
+          matInput
+          (keyup)="applyFilter($event.target.value)"
+          placeholder="Search"
+        />
+      </mat-form-field>
+    </div>
+  </div>
+  <div class="content-card mat-blac-bg">
+    <mat-table
+      class="zone-table"
+      #table
+      [dataSource]="dataSource"
+      [@animateStagger]="{ value: '50' }"
+      fusePerfectScrollbar
+    >
+      <ng-container cdkColumnDef="checkbox">
+        <mat-header-cell *cdkHeaderCellDef>
+          <mat-checkbox
+            (change)="$event ? masterToggle() : null"
+            [checked]="selection.hasValue() && isAllSelected()"
+            [indeterminate]="selection.hasValue() && !isAllSelected()"
+            [aria-label]="checkboxLabel()"
+          ></mat-checkbox>
+        </mat-header-cell>
+        <mat-cell *cdkCellDef="let user">
+          <mat-checkbox
+            (click)="$event.stopPropagation()"
+            (change)="$event ? userToggle(user) : null"
+            [checked]="selection.isSelected(user)"
+            [aria-label]="checkboxLabel(row)"
+          ></mat-checkbox>
+        </mat-cell>
+      </ng-container>
+      <ng-container cdkColumnDef="name">
+        <mat-header-cell *cdkHeaderCellDef>Name</mat-header-cell>
+        <mat-cell *cdkCellDef="let zone">
+          <p class="phone text-truncate">{{ zone.zone_name }}</p>
+        </mat-cell>
+      </ng-container>
+      <ng-container cdkColumnDef="description">
+        <mat-header-cell *cdkHeaderCellDef>Description</mat-header-cell>
+        <mat-cell *cdkCellDef="let zone">
+          <p class="phone text-truncate">{{ zone.zone_description || "-" }}</p>
+        </mat-cell>
+      </ng-container>
+      <mat-header-row *cdkHeaderRowDef="displayedColumns"></mat-header-row>
+      <mat-row *cdkRowDef="let row; columns: displayedColumns" class="user">
+      </mat-row>
+    </mat-table>
+    <mat-paginator
+      [pageSizeOptions]="[5, 10, 20]"
+      showFirstLastButtons
+    ></mat-paginator>
+  </div>
+</div>

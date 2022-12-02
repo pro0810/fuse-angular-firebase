@@ -1,0 +1,227 @@
+<div id="emergency" class="page-layout carded fullwidth" fusePerfectScrollbar>
+    <div class="top-bg mat-accent-bg"></div>
+    <div class="center">
+        <div class="header white-fg" fxLayout="row" fxLayoutAlign="space-between center">
+            <div fxLayout="row" fxLayoutAlign="start center">
+                <button class="mr-0 mr-sm-16" mat-icon-button [routerLink]="'/emergencies'">
+                    <mat-icon>arrow_back</mat-icon>
+                </button>
+                <div fxLayout="column" fxLayoutAlign="start start" *fuseIfOnDom
+                    [@animate]="{value:'*',params:{delay:'100ms',x:'-25px'}}">
+                    <div class="h2" *ngIf="pageType ==='edit'">
+                        {{emergency.name}}
+                    </div>
+                    <div class="h2" *ngIf="pageType ==='new'">
+                        New Emergency
+                    </div>
+                    <div class="subtitle secondary-text" *ngIf="pageType ==='edit'">
+                        <span>{{emergency.description}}</span>
+                    </div>
+                </div>
+            </div>
+            <div fxLayout="row" fxLayoutAlign="end center" *ngIf="pageType ==='edit'">
+                <div class="title-status">
+                    <div class="panel panel-primary">
+                        <div class="panel-heading panel-yellow">
+                            <div class="row">
+                                <div class="col-xs-9 text-center">
+                                    <span *ngIf="emergency.usersNotified"> {{emergency.usersNotified.length}} </span>
+                                    <span *ngIf="!emergency.usersNotified"> 0 </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel-footer text-center">
+                            <span class="text-small">&nbsp;Notified&nbsp;</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="title-status">
+                    <div class="panel panel-primary">
+                        <div class="panel-heading panel-green">
+                            <div class="row">
+                                <div class="col-xs-9 text-center">
+                                    <span
+                                        *ngIf="emergency.usersReplied">{{(emergency | IamOK | async)?.length || 0}}</span>
+                                    <span *ngIf="!emergency.usersReplied">{{0}}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel-footer text-center">
+                            <span class="text-small">&nbsp;Ok&nbsp;</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="title-status">
+                    <div class="panel panel-primary">
+                        <div class="panel-heading panel-red">
+                            <div class="row">
+                                <div class="col-xs-9 text-center">
+                                    <span
+                                        *ngIf="emergency.usersReplied">{{(emergency | needHelp | async)?.length || 0}}</span>
+                                    <span *ngIf="!emergency.usersReplied">{{0}}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel-footer text-center">
+                            <span class="text-small">&nbsp;Need&nbsp;Help&nbsp;</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="title-status">
+                    <div class="panel panel-primary">
+                        <div class="panel-heading panel-red">
+                            <div class="row">
+                                <div class="col-xs-9 text-center">
+                                    <span
+                                        *ngIf="emergency.usersReplied">{{(emergency | acknow | async)?.length || 0}}</span>
+                                    <span *ngIf="!emergency.usersReplied">{{0}}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel-footer text-center">
+                            <span class="text-small">Acknowledged</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="title-status">
+                    <div class="panel panel-primary">
+                        <div class="panel-heading">
+                            <div class="row">
+                                <div class="col-xs-9 text-center">
+                                    <span *ngIf="emergency.usersReplied && emergency.usersNotified">
+                                        {{emergency.usersNotified.length - ((emergency | noresp | async)?.length || 0)}}
+                                    </span>
+                                    <span *ngIf="!emergency.usersReplied && emergency.usersNotified">
+                                        {{emergency.usersNotified.length}} </span>
+                                    <span *ngIf="!emergency.usersReplied && !emergency.usersNotified"> {{0}} </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel-footer text-center">
+                            <span class="text-small">No&nbsp;Response</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div fxLayout="row" fxLayoutAlign="end center" class="mt-16 mt-sm-10" *ngIf="pageType ==='edit'">
+                <div class="col-lg-2 col-md-4 ng-isolate-scope">
+                    <div class="panel-date">
+                        <div class="subtitle text-date">
+                            <p class="text-truncate">Started&nbsp; {{emergency.startedAt | date}} {{' '}}
+                                {{emergency.startedAt | date:'HH:mm:ss'}}</p>
+                        </div>
+                        <div class="subtitle text-date">
+                            <p class="text-truncate" *ngIf="!emergency.active && emergency.endedAt!=0"> Ended&nbsp;
+                                {{emergency.endedAt | date}} {{' '}} {{emergency.endedAt | date:'HH:mm:ss'}}</p>
+                            <p class="text-truncate" *ngIf="emergency.active || emergency.endedAt==0">Ended&nbsp;
+                                {{"---"}} </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <button mat-raised-button class="save-product-button mat-white-bg mt-16 mt-sm-0"
+                [disabled]="emergencyForm.invalid || (emergency.type == 'USERS' && emergency.users.length==0)"
+                *ngIf="pageType ==='new'" (click)="addEmergency()">
+                <span>ADD</span>
+            </button>
+            <button mat-raised-button class="save-product-button mat-white-bg mt-16 mt-sm-0"
+                *ngIf="pageType ==='edit'&& selectedIndex!==1" (click)="onAction()">
+                <span *ngIf="emergency.active">STOP EMERGENCY</span>
+                <span *ngIf="!emergency.active">START EMERGENCY</span>
+            </button>
+            <button mat-raised-button class="save-product-button mat-white-bg mt-16 mt-sm-0"
+                *ngIf="pageType ==='edit' && selectedIndex==1" (click)="onSend()">
+                <span *ngIf="selectedIndex==1">SEND</span>
+            </button>
+        </div>
+        <div class="content-card mat-white-bg">
+            <div class="content">
+                <form name="emergencyForm" [formGroup]="emergencyForm" class="product w-100-p" fxLayout="column" fxFlex>
+                    <mat-tab-group [(selectedIndex)]="selectedIndex">
+                        <mat-tab label="Emergency Info">
+                            <div fxLayout="row">
+                                <div class="tab-content w-60-p p-24" fxLayout="column" *ngIf="pageType ==='new'">
+                                    <mat-form-field *ngIf="pageType ==='new'">
+                                        <mat-select placeholder="Select Emergency Type" formControlName="emergencyType"
+                                            [(ngModel)]="selectedType" (selectionChange)="onSelectType()">
+                                            <mat-option *ngFor="let type of emergencyTypes" [value]="type">
+                                                {{ convertCaps(type) }} Emergency
+                                            </mat-option>
+                                        </mat-select>
+                                    </mat-form-field>
+                                    <mat-form-field class="w-100-p" *ngIf="pageType ==='new'">
+                                        <input matInput name="name" formControlName="name" placeholder="Emergency Name"
+                                            required>
+                                    </mat-form-field>
+                                    <mat-form-field class="w-100-p" *ngIf="pageType ==='new'">
+                                        <textarea matInput name="description" formControlName="description"
+                                            placeholder="Emergency Description" rows="5">
+                                          </textarea>
+                                    </mat-form-field>
+                                    <ng-container *ngIf="emergency.type">
+                                        <mat-checkbox class="radioBtn" formControlName="sound">Emergency Sound</mat-checkbox>
+                                        <mat-checkbox (change)="changeStatus()" class="radioBtn">Alert only
+                                        </mat-checkbox>
+                                    </ng-container>
+                                    <div [class.hidden]="!notifyToggle">
+                                        <mat-radio-group formControlName="notify">
+                                            <mat-radio-button class="radioBtn" [checked]="checkChecked()"
+                                                value="notifySelected" *ngIf="emergency.type == 'USERS'">Alert selected
+                                                users
+                                            </mat-radio-button>
+                                            <mat-radio-button class="radioBtn" [checked]="checkChecked()"
+                                                value="notifySelected" *ngIf="emergency.type == 'ZONE'">Alert users
+                                                inside selected zones
+                                            </mat-radio-button>
+                                            <mat-radio-button class="radioBtn" [checked]="checkChecked()"
+                                                value="notifySelected" *ngIf="emergency.type == 'AREA'">Alert users
+                                                inside area
+                                            </mat-radio-button>
+                                            <mat-radio-button class="radioBtn" value="notifyAllUsers">Alert all users
+                                            </mat-radio-button>
+                                        </mat-radio-group>
+                                        <mat-form-field class="w-100-p" style="margin-top: 1em">
+                                            <textarea matInput formControlName="notificationMsg"
+                                                placeholder="Alert message"></textarea>
+                                        </mat-form-field>
+                                    </div>
+                                </div>
+                                <div class="tab-content w-60-p p-12" fxLayout="column" *ngIf="pageType ==='edit'">
+                                    <app-emg-user-list (toggleListAndMap)="getToggleData($event)"
+                                        [emergency]="emergency"></app-emg-user-list>
+                                </div>
+                                <div [ngClass]="pageType ==='new' ? 'w-100-p p-12 pl-0':'w-40-p p-8 pl-0'">
+                                    <div [hidden]="toggle">
+                                        <div id="mapView" class="w-100-p h-600"
+                                            [hidden]="emergency.type != 'AREA' && pageType ==='new'"></div>
+                                    </div>
+                                    <ng-container *ngIf="toggle">
+                                        <app-add-new-user (sendToggleEvent)="toggleEvent($event)" class="w-100-p h-600"
+                                            [emergency]="emergency"></app-add-new-user>
+                                    </ng-container>
+                                    <app-emg-user-list [emergency]="emergency"
+                                        *ngIf="pageType ==='new' && emergency.type == 'USERS'"></app-emg-user-list>
+                                    <app-emg-zone-list *ngIf="pageType ==='new' && emergency.type == 'ZONE'">
+                                    </app-emg-zone-list>
+                                </div>
+                            </div>
+                        </mat-tab>
+                        <mat-tab label="Messages" *ngIf="pageType ==='edit'">
+                            <app-emg-bulk-msg [emergency]="emergency"></app-emg-bulk-msg>
+                        </mat-tab>
+                        <mat-tab label="Summary"
+                            *ngIf="pageType === 'edit' && emergency.type == 'USERS' && selectedOrg">
+                            <app-emg-sum-list [emergency]="emergency"></app-emg-sum-list>
+                        </mat-tab>
+                        <mat-tab label="Summary" *ngIf="pageType === 'edit' && emergency.type == 'AREA' && selectedOrg">
+                            <app-emg-sum-list [emergency]="emergency"></app-emg-sum-list>
+                        </mat-tab>
+                        <mat-tab label="Summary" *ngIf="pageType === 'edit' && emergency.type == 'ZONE' && selectedOrg">
+                            <app-emg-sum-list [emergency]="emergency"></app-emg-sum-list>
+                        </mat-tab>
+                    </mat-tab-group>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

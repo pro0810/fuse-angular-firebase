@@ -1,0 +1,51 @@
+@import "src/@fuse/scss/fuse";
+
+#chat {
+    display: flex;
+    flex: 1;
+
+    .center {
+        padding: 32px !important;
+        max-width: 1400px;
+        margin: 0 auto;
+
+        @include media-breakpoint-down(md) {
+            padding: 0 !important;
+        }
+
+        .content-card {
+            display: flex;
+            flex: 1;
+            position: relative;
+            background: url('/assets/images/patterns/rain-grey.png') repeat;
+
+            .mat-sidenav-container {
+                display: flex;
+                flex: 1;
+                width: 100%;
+                background: transparent;
+
+                > .mat-sidenav-content,
+                > .mat-drawer-content {
+                    display: flex;
+                    flex: 1 1 auto;
+                    min-height: 100%;
+                    height: auto;
+                }
+
+                > .mat-drawer-content {
+                    max-width: 100%;
+                }
+
+                mat-sidenav {
+                    display: flex;
+                    flex-direction: column;
+                    width: 400px;
+                    max-width: 90%;
+                    box-shadow: 0 0 1px rgba(0, 0, 0, .37);
+                    overflow: hidden;
+                }
+            }
+        }
+    }
+}

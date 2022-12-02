@@ -1,0 +1,11 @@
+<div [ngSwitch]="view" class="views">
+  <app-chat-chats-sidenav class="view"
+                           *ngSwitchCase="'chats'"
+                           [@slideInRight]>
+  </app-chat-chats-sidenav>
+
+  <app-chat-user-sidenav class="view"
+                          *ngSwitchCase="'user'"
+                          [@slideInLeft]>
+  </app-chat-user-sidenav>
+</div>

@@ -1,0 +1,46 @@
+<ng-container *ngIf="layout == 'vertical'">
+
+    <div class="navbar-vertical">
+
+        <div class="navbar-header">
+
+            <!-- <div class="logo">
+                <img class="logo-icon" src="assets/images/logos/fuse.svg">
+                <span class="logo-text">FUSE</span>
+            </div> -->
+
+            <a class="logo" href="/emergencies">
+                <img width="110px" src="assets/images/logos/RapidAssist logo.png">
+                <!-- <span class="logo-text" style="padding-top:10px;">Admin</span> -->  
+            </a>
+
+
+            <button mat-icon-button class="toggle-sidebar-folded"
+                    (click)="toggleSidebarFolded()" fxHide.lt-lg>
+                <mat-icon>menu</mat-icon>
+            </button>
+
+            <button mat-icon-button class="toggle-sidebar-opened"
+                    (click)="toggleSidebarOpened()" fxHide.gt-md>
+                    sdfdsfdsfsdfdsf
+                <mat-icon>arrow_back</mat-icon>
+            </button>
+
+        </div>
+
+        <div class="navbar-content" fusePerfectScrollbar
+             [fusePerfectScrollbarOptions]="{suppressScrollX: true}">
+            <fuse-navigation layout="vertical"></fuse-navigation>
+        </div>
+
+    </div>
+
+</ng-container>
+
+<ng-container *ngIf="layout == 'horizontal'">
+
+    <div class="navbar-horizontal">
+        <fuse-navigation layout="horizontal"></fuse-navigation>
+    </div>
+
+</ng-container>

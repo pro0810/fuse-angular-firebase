@@ -1,0 +1,113 @@
+@import "src/@fuse/scss/fuse";
+
+:host {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+
+    .sidenav-header {
+
+        mat-toolbar {
+            border-bottom: 1px solid rgba(0, 0, 0, .08);
+
+            .avatar-wrapper {
+
+                .avatar, .status {
+                    cursor: pointer;
+                }
+            }
+
+            .search {
+                height: 36px;
+                line-height: 36px;
+                padding: 8px;
+                background: #FFFFFF;
+                font-size: 13px;
+                @include mat-elevation(1);
+
+                .icon {
+                    margin: 0;
+                    color: rgba(0, 0, 0, 0.54);
+                }
+
+                input {
+                    padding-left: 12px;
+                    height: 36px;
+                    color: rgba(0, 0, 0, 0.54);
+                    border: none;
+                }
+            }
+        }
+    }
+
+    .sidenav-content {
+        overflow: auto;
+
+        .contact-list, .chat-list {
+
+            .mat-subheader {
+                padding-left: 16px;
+                font-size: 20px;
+                font-weight: 300;
+                height: 88px;
+                line-height: 88px;
+                color: mat-color($accent);
+            }
+
+            .contact {
+                white-space: normal;
+                text-align: left;
+                letter-spacing: .010em;
+                min-height: 88px;
+                border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+                padding: 16px;
+                font-weight: 400;
+
+                .avatar-wrapper {
+
+                    .avatar {
+                        margin-right: 16px;
+                    }
+                }
+
+                .contact-name {
+                    font-size: 16px;
+                    white-space: nowrap;
+                    text-overflow: ellipsis;
+                }
+
+                .contact-last-message {
+                    line-height: 1.6em;
+                    margin: 0;
+                    font-weight: 500;
+                    color: rgba(0, 0, 0, 0.54);
+                }
+
+                .contact-mood {
+                    line-height: normal;
+                    margin-top: 0;
+                }
+
+                .unread-message-count {
+                    border-radius: 50%;
+                    text-align: center;
+                    width: 24px;
+                    height: 24px;
+                    line-height: 24px;
+                    background-color: mat-color($accent);
+                    color: map-get($accent, default-contrast);
+                }
+            }
+        }
+
+        .no-results-message {
+            position: absolute;
+            width: 100%;
+            height: 88px;
+            padding: 16px;
+            background: #FFFFFF;
+            font-size: 15px;
+            font-weight: 400;
+        }
+    }
+}

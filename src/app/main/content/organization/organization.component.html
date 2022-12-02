@@ -1,0 +1,266 @@
+<div id="org" class="page-layout carded fullwidth" fusePerfectScrollbar>
+
+    <!-- TOP BACKGROUND -->
+    <div class="top-bg mat-accent-bg"></div>
+    <!-- / TOP BACKGROUND -->
+  
+    <!-- CENTER -->
+    <div class="center">
+  
+        <!-- HEADER -->
+        <div class="header white-fg" fxLayout="row" fxLayoutAlign="space-between center">
+  
+            <!-- APP TITLE -->
+            <div fxLayout="row" fxLayoutAlign="start center">
+  
+                <button class="mr-0 mr-sm-16" mat-icon-button [routerLink]="'/orgs'">
+                    <mat-icon>arrow_back</mat-icon>
+                </button>
+  
+                <div class="org-image mr-8 mr-sm-16" *fuseIfOnDom [@animate]="{value:'*',params:{delay:'50ms',scale:'0.2'}}">
+                    <!-- <img [src]="'assets/images/avatars/profile_group.png'"> -->
+                    <mat-icon class="s-48 mat-icon material-icons" role="img" aria-hidden="true">business</mat-icon>
+                </div>
+  
+                <div fxLayout="column" fxLayoutAlign="start start"
+                     *fuseIfOnDom [@animate]="{value:'*',params:{delay:'100ms',x:'-25px'}}">
+                    <div class="h2" *ngIf="pageType ==='edit'">
+                        {{org.name}}
+                    </div>
+                    <div class="h2" *ngIf="pageType ==='new'">
+                        New Organization
+                    </div>
+                    <div class="subtitle secondary-text">
+                        <span>Organization Detail</span>
+                    </div>
+                </div>
+            </div>
+            <!-- / APP TITLE -->
+  
+            <button mat-raised-button
+                    class="save-product-button mat-white-bg mt-16 mt-sm-0"
+                    [disabled]="orgForm.invalid"
+                    *ngIf="pageType ==='new'" (click)="addOrg()">
+                <span>ADD</span>
+            </button>
+  
+            <button mat-raised-button
+                    class="save-product-button mat-white-bg mt-16 mt-sm-0"
+                    [disabled]="orgForm.invalid || orgForm.pristine"
+                    *ngIf="pageType ==='edit'" (click)="saveOrg()">
+                <span>SAVE</span>
+            </button>
+        </div>
+        <!-- / HEADER -->
+  
+        <!-- CONTENT CARD -->
+        <div class="content-card mat-white-bg">
+  
+            <!-- CONTENT -->
+            <div class="content">
+  
+                <form name="orgForm" [formGroup]="orgForm" class="product w-100-p" fxLayout="column" fxFlex>
+  
+                    <mat-tab-group (selectedTabChange)="onLinkClick($event)">
+  
+                        <mat-tab label="Basic Info">
+                            <div class="tab-content p-24" fusePerfectScrollbar>
+  
+                                <mat-form-field class="w-100-p">
+                                    <input matInput
+                                           name="name"
+                                           formControlName="name"
+                                           placeholder="Organization Name"
+                                           required>
+                                </mat-form-field>
+
+                                <mat-form-field class="w-100-p">
+                                    <!-- <input matInput
+                                            name="owner_name"
+                                            formControlName="owner_name"
+                                            placeholder="Owner Name"
+                                            required> -->
+                                    <input matInput
+                                        placeholder="Owner Name"
+                                        value="{{(this.org.ownerId|coordinator|async)?.name}}"
+                                        disabled>
+                                </mat-form-field>
+
+                                <mat-form-field class="w-100-p">
+                                    <!-- <input matInput
+                                            name="owner_email"
+                                            formControlName="owner_email"
+                                            placeholder="Owner Email"
+                                            required> -->
+                                    <input matInput
+                                        placeholder="Owner Email"
+                                        value="{{(this.org.ownerId|coordinator|async)?.email}}"
+                                        disabled>
+                                </mat-form-field>
+  
+                                <mat-form-field class="w-100-p">
+                                    <textarea matInput
+                                              name="description"
+                                              formControlName="description"
+                                              placeholder="Organization Description"
+                                              rows="5">
+                                    </textarea>
+                                </mat-form-field>
+
+                            </div>
+                        </mat-tab>
+  
+                        <!-- <mat-tab label="Coordinators" *ngIf="pageType ==='edit'">
+                            <app-org-coordinator-list [organization]="org"></app-org-coordinator-list>
+                        </mat-tab>
+
+                        <mat-tab label="Users" *ngIf="pageType ==='edit'">
+                            <app-org-user-list [organization]="org"></app-org-user-list>
+                        </mat-tab> -->
+  
+                        <mat-tab label="Location">
+                            <div fxLayout="row">
+                                <div class="tab-content w-60-p p-24" fxLayout="column">
+      
+                                    <!-- <mat-form-field class="w-100-p">
+                                        <input matInput
+                                               name="location_name"
+                                               formControlName="location_name"
+                                               placeholder="Location Name">
+                                    </mat-form-field>
+      
+                                    <mat-form-field class="w-100-p">
+                                        <input matInput
+                                               name="location_addr"
+                                               formControlName="location_addr"
+                                               placeholder="Loaction Address">
+                                    </mat-form-field> -->
+      
+                                    <mat-form-field class="w-100-p">
+                                        <input matInput
+                                               name="location_lat"
+                                               formControlName="location_lat"
+                                               placeholder="latitude">
+                                    </mat-form-field>
+      
+                                    <mat-form-field class="w-100-p">
+                                        <input matInput
+                                               name="location_lng"
+                                               formControlName="location_lng"
+                                               placeholder="longitude">
+                                    </mat-form-field>
+      
+                                </div>
+                                
+                                <div class="w-100-p p-24 pl-0">
+                                    <agm-map class="w-100-p h-600" [zoom]="15"
+                                           [latitude]="org.location.lat"
+                                           [longitude]="org.location.lng"
+                                           (mapClick) = "mapClick($event)"
+                                           [draggingCursor]="'url(https://d30y9cdsu7xlg0.cloudfront.net/png/2030-200.png), auto;'"
+                                           [draggableCursor]="'url(https://d30y9cdsu7xlg0.cloudfront.net/png/2030-200.png), auto;'">
+                                      <agm-marker [latitude]="org.location.lat"
+                                                  [longitude]="org.location.lng">
+                                      </agm-marker>
+                                    </agm-map>
+                                </div>
+                            </div>
+                          
+                        </mat-tab>
+  
+                        <mat-tab label="Account Info">
+                            <div class="tab-content p-24" fusePerfectScrollbar>
+  
+                                <mat-form-field class="w-100-p">
+                                    <input matInput
+                                          name="mem_size"
+                                          value="{{org.mem_size}}"
+                                          disabled
+                                          placeholder="Current Number of User Accounts"
+                                          type="number">
+                                </mat-form-field>
+  
+                                <mat-form-field class="w-100-p" *ngIf="isAdmin">
+                                        <input matInput
+                                                name="max_size"
+                                                formControlName="max_size"
+                                                (input)="onMaxSizeChange($event.target.value)"
+                                                placeholder="Maximum Number of User Accounts Permitted"
+                                                type="number">
+                                    </mat-form-field>
+                                <mat-form-field class="w-100-p" *ngIf="org.max_size >= selectedMaxMem && !isAdmin">
+                                    <input matInput
+                                            name="max_size"
+                                            formControlName="max_size"
+                                            (input)="onMaxSizeChange($event.target.value)"
+                                            placeholder="Maximum Number of User Accounts Permitted"
+                                            type="number">
+                                </mat-form-field>
+                                <div class="w-100-p" *ngIf="selectedMaxMem > org.max_size && !isAdmin">
+                                    <mat-form-field class="w-50-p">
+                                        <input matInput
+                                            name="max_size"
+                                            formControlName="max_size"
+                                            (input)="onMaxSizeChange($event.target.value)"
+                                            placeholder="Maximum Number of User Accounts Permitted"
+                                            type="number">
+                                    </mat-form-field>
+    
+                                    <button mat-raised-button class="w-50-p"
+                                        class="mat-black-bg mt-16 mt-sm-0"
+                                        class="emg-color-bg"
+                                        (click)="contact()">
+                                          <span>Please Contact Llamagard</span>
+                                      </button>
+                                </div>
+
+                            </div>
+                        </mat-tab>
+                        <mat-tab label="Emergency Numbers">
+                            <div class="tab-content p-24" fusePerfectScrollbar>
+                                <mat-form-field class="w-100-p">
+                                    <input matInput
+                                            name="localService"
+                                            formControlName="localService"
+                                            placeholder="Emergency Services Phone Number"
+                                            (input)="onLocalPhoneChange($event)"
+                                            required>                                            
+                                </mat-form-field>
+
+                                <mat-form-field class="w-100-p">
+                                    <input matInput
+                                        name="coordPhone"
+                                        formControlName="coordPhone"
+                                        placeholder="Emergency Coordinator Phone Number (ex.+18002345670)"
+                                        (input)="onPhoneChange($event)"
+                                        required>
+                                    <span matPrefix>+&nbsp;</span>
+                                    <mat-icon *ngIf="isValidPhone && coordPhone" class="green-icon" matSuffix>check</mat-icon>
+                                    <mat-icon *ngIf="!isValidPhone && coordPhone" class="red-icon" matSuffix>close</mat-icon>
+                                    <!-- <mat-error *ngIf="phone.valid">Invalid Phone Number</mat-error> -->
+                                </mat-form-field>
+
+                                <mat-form-field class="w-100-p">
+                                    <input matInput
+                                            name="configOrgMin"
+                                            formControlName="configOrgMin"
+                                            placeholder="Send a SMS text message if user doesn't respond (mins)"
+                                            (input)="onConfigOrgChange($event)"
+                                            required>                                            
+                                </mat-form-field>
+                            </div>
+                        </mat-tab>
+
+                    </mat-tab-group>
+                </form>
+  
+            </div>
+            <!-- / CONTENT -->
+  
+        </div>
+        <!-- / CONTENT CARD -->
+  
+    </div>
+    <!-- / CENTER -->
+  </div>
+  

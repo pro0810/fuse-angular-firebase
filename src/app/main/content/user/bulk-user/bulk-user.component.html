@@ -1,0 +1,26 @@
+<mat-progress-bar *ngIf="isProcessing" mode="indeterminate" [color]="'warn'" class="w-100-p"></mat-progress-bar>
+<div id="bulk-user" class="p-24">
+    
+  <mat-select placeholder="Select Organization" [(ngModel)]="selectedOrg" (change)="onSelectOrg()" class="w-300 mb-20">
+      <mat-option *ngFor="let org of orgList" [value]="org">
+          {{ org.name }}
+      </mat-option>
+  </mat-select>
+    <div class="" fxLayout="row">
+      <input #myInput hidden type="file" (change)="onFileChange($event)" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" #fileInput/>
+      <button mat-raised-button
+        class="save-product-button emg-button mt-16 mt-sm-0"
+        (click)="fileInput.click()">
+        <span>Select .csv file</span>
+      </button>
+      <p class="ml-8 mb-0" *ngIf="fileSelected">{{fileSelected.name}}</p>
+    </div>
+    <p *ngIf="fileSelectionError" class="emg-color">{{fileSelectionError}}</p>
+
+    <div *ngFor="let user of userlist" fxLayout="row" class="p-0 h-20">
+      <p>{{user.name}}, {{user.phone}} {{user.isValid?"":"(invalid)"}}</p>
+      <mat-icon *ngIf="user.uploadStatus==1" class="green-icon" style="margin-top: 12px;">check</mat-icon>
+      <mat-icon *ngIf="user.uploadStatus==2" class="red-icon" style="margin-top: 12px;">close</mat-icon>
+    </div>
+
+</div>

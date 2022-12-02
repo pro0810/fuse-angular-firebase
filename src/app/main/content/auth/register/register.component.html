@@ -1,0 +1,121 @@
+<div id="register" fxLayout="row" fxLayoutAlign="start">
+
+    <div id="register-intro" fxFlex fxHide fxShow.gt-xs>
+
+        <div class="logo" *fuseIfOnDom [@animate]="{value:'*',params:{scale:'0.2'}}">
+            <img src="assets/images/logos/RapidAssist logo.png">
+        </div>
+
+        <div class="title" *fuseIfOnDom [@animate]="{value:'*',params:{delay:'50ms',y:'25px'}}">
+            Welcome to RapidAssist
+        </div>
+
+        <div class="description" *fuseIfOnDom [@animate]="{value:'*',params:{delay:'100ms',y:'25px'}}">
+            RapidAssist enables an organization, family and friends to locate, 
+            track and communicate with people they care about through a single system in an emergency.
+        </div>
+
+    </div>
+
+    <div id="register-form-wrapper" fusePerfectScrollbar *fuseIfOnDom
+         [@animate]="{value:'*',params:{delay:'300ms',x:'100%'}}">
+
+        <div id="register-form">
+
+            <div class="logo" fxHide.gt-xs>
+                <!-- <span>F</span> -->
+                <img src="assets/images/logos/logo-black.png">
+            </div>
+
+            <div class="title">Create an Account</div>
+
+            <form name="registerForm" [formGroup]="registerForm" novalidate>
+
+                <mat-form-field>
+                    <input matInput placeholder="Organization Name" formControlName="orgName">
+                    <mat-error *ngIf="registerFormErrors.orgName.required">
+                        Organization Name is required
+                    </mat-error>
+                </mat-form-field>
+
+                <div fxLayout="row"
+                    fxLayoutAlign="start center">
+                    <mat-form-field>
+                        <input matInput placeholder="Default Location" 
+                            value="{{convertDMS(defaultLocation.lat, defaultLocation.lng)}}"
+                            disabled>
+                        <!-- <input matInput placeholder="Default Location" 
+                            value="{{defaultLocation.lat}}, {{defaultLocation.lng}}"
+                            disabled> -->
+                    </mat-form-field>
+                    <button mat-mini-fab class="emg-color-bg" (click)="onClickLocation()">
+                        <mat-icon aria-label="" >my_location</mat-icon>
+                    </button>
+                </div>
+
+                <mat-form-field>
+                    <input matInput placeholder="Name" formControlName="name">
+                    <mat-error *ngIf="registerFormErrors.name.required">
+                        Name is required
+                    </mat-error>
+                </mat-form-field>
+
+                <mat-form-field>
+                    <input matInput placeholder="Email" formControlName="email">
+                    <mat-error *ngIf="registerFormErrors.email.required">
+                        Email is required
+                    </mat-error>
+                    <mat-error *ngIf="!registerFormErrors.email.required && registerFormErrors.email.email">
+                        Please enter a valid email address
+                    </mat-error>
+                </mat-form-field>
+
+                <mat-form-field>
+                    <input matInput type="password" placeholder="Password" formControlName="password">
+                    <mat-error *ngIf="registerFormErrors.password.required">
+                        Password is required
+                    </mat-error>
+                    <mat-error *ngIf="registerFormErrors.password.minlength">
+                        Password must be at least 6 characters long.
+                    </mat-error>
+                </mat-form-field>
+
+                <mat-form-field>
+                    <input matInput type="password" placeholder="Password (Confirm)" formControlName="passwordConfirm">
+                    <mat-error *ngIf="registerFormErrors.passwordConfirm.required">
+                        Password confirmation is required
+                    </mat-error>
+                    <mat-error *ngIf="registerFormErrors.passwordConfirm.passwordsNotMatch">
+                        Passwords must match
+                    </mat-error>
+                </mat-form-field>
+
+                <!-- <mat-form-field>
+                    <mat-select placeholder="Select Your Organization" formControlName="organization" [(ngModel)]="selectedOrg">
+                        <mat-option *ngFor="let org of orgList" [value]="org">
+                            {{ org.name }}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field> -->
+
+                <div class="terms" fxLayout="row" fxLayoutAlign="center center">
+                    <mat-checkbox name="terms" aria-label="Accept" (change)="onCheckTerms($event)"  required>
+                        <span>Accept</span>
+                    </mat-checkbox>
+                    <a (click)="readPrivacyPolicy()" style="cursor: pointer;" class="emg-color">terms and conditions</a>
+                </div>
+
+                <button mat-raised-button class="submit-button emg-button" aria-label="CREATE AN ACCOUNT"
+                        [disabled]="registerForm.invalid" (click)="createWithEmailAndPassword()">
+                    CREATE AN ACCOUNT
+                </button>
+
+            </form>
+
+            <div class="register" fxLayout="column" fxLayoutAlign="center center">
+                <span class="text">Already have an account?</span>
+                <a class="link emg-color" [routerLink]="'/login'">Login</a>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,135 @@
+#emergency {
+  .header {
+    .coordinator-image {
+      overflow: hidden;
+      width: 56px;
+      height: 56px;
+      border: 3px solid rgba(0, 0, 0, 0.12);
+
+      img {
+        height: 100%;
+        width: auto;
+        max-width: none;
+      }
+    }
+
+    .subtitle {
+      margin: 6px 0 0 0;
+    }
+
+    .title-status {
+      width: 104px !important;
+      min-width: 104px !important;
+    }
+
+    .panel-date {
+      margin: 2px;
+    }
+
+    .text-center {
+      text-align: center;
+    }
+
+    .text-date {
+      color: #fff;
+    }
+
+    .panel-primary {
+      border-color: #0000;
+    }
+    .panel {
+      background-color: #0000;
+      //border: 1px solid transparent;
+      border-radius: 2px;
+      -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
+      box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
+      margin: 6px;
+    }
+    .panel-primary > .panel-heading {
+      color: #858585;
+      background-color: #fff;
+      border-color: #0000;
+      font-size: 20px;
+    }
+    .panel-heading {
+      padding: 10px 15px;
+      border-bottom: 1px solid transparent;
+      border-top-left-radius: 1px;
+      border-top-right-radius: 1px;
+    }
+    .panel-yellow {
+      color: #ffc000 !important;
+    }
+    .panel-green {
+      color: #70ad47 !important;
+    }
+    .panel-red {
+      color: #f00 !important;
+    }
+    .panel-footer {
+      padding: 10px 15px;
+      background-color: #303540;
+      margin-top: 2px;
+      border-bottom-right-radius: 1px;
+      border-bottom-left-radius: 1px;
+    }
+    .text-small {
+      font-size: 10px;
+    }
+
+    .panel-right2 {
+      right: 25%;
+    }
+    .panel-right1 {
+      right: 15%;
+    }
+  }
+
+  //     .content {
+  //         .green-icon {
+  //             color: green;
+  //         }
+  //         .red-icon {
+  //             color: red;
+  //         }
+  //         .mat-tab-group,
+  //         .mat-tab-body-wrapper,
+  //         .tab-content{
+  //             flex: 1 1 auto;
+  //             max-width: 100%;
+  //         }
+
+  //         .mat-tab-body-content {
+  //             display: flex;
+  //         }
+
+  //         .mat-tab-label {
+  //             height: 64px;
+  //         }
+
+  //         .coordinator-image {
+  //             overflow: hidden;
+  //             width: 128px;
+  //             height: 128px;
+  //             margin-right: 16px;
+  //             margin-bottom: 16px;
+  //             border: 3px solid rgba(0, 0, 0, 0.12);
+
+  //             img {
+  //                 height: 100%;
+  //                 width: auto;
+  //                 max-width: none;
+  //             }
+  //         }
+
+  //     }
+}
+
+.radioBtn {
+  display: block;
+  margin-top: 0.8em;
+  opacity: 0.6;
+}
+.hidden {
+  display: none;
+}

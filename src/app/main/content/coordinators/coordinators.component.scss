@@ -1,0 +1,94 @@
+@import "src/@fuse/scss/fuse";
+
+:host {
+  .header {
+    .search-input-wrapper {
+      max-width: 480px;
+    }
+
+    @include media-breakpoint-down(xs) {
+      height: 176px !important;
+      min-height: 176px !important;
+      max-height: 176px !important;
+    }
+  }
+
+  [hidden] {
+    display: none !important;
+  }
+
+  .coordinators-table {
+    flex: 1 1 auto;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+    overflow: auto;
+
+    .mat-header-row {
+      min-height: 64px;
+    }
+
+    .mat-header-cell {
+      overflow: visible;
+    }
+
+    .mat-cell {
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      overflow: visible;
+    }
+
+    .mat-column-checkbox {
+      max-width: 54px;
+    }
+
+    .mat-column-photo {
+      flex: 0 1 64px;
+    }
+
+    .mat-column-appliedLoan {
+      flex: 0 1 60px;
+    }
+
+    .active-icon {
+      border-radius: 50%;
+    }
+  }
+
+  .content {
+    .green-icon {
+      color: green;
+    }
+    .red-icon {
+      color: red;
+    }
+    .mat-tab-group,
+    .mat-tab-body-wrapper,
+    .tab-content {
+      flex: 1 1 auto;
+      max-width: 100%;
+    }
+
+    .mat-tab-body-content {
+      display: flex;
+    }
+
+    .mat-tab-label {
+      height: 64px;
+    }
+
+    .user-image {
+      overflow: hidden;
+      width: 128px;
+      height: 128px;
+      margin-right: 16px;
+      margin-bottom: 16px;
+      border: 3px solid rgba(0, 0, 0, 0.12);
+
+      img {
+        height: 100%;
+        width: auto;
+        max-width: none;
+      }
+    }
+  }
+}

@@ -1,0 +1,110 @@
+<div id="coordinator" class="page-layout carded fullwidth" fusePerfectScrollbar>
+  <div class="top-bg mat-accent-bg"></div>
+  <div class="center">
+    <div
+      class="header white-fg"
+      fxLayout="row"
+      fxLayoutAlign="space-between center"
+    >
+      <div fxLayout="row" fxLayoutAlign="start center">
+        <button
+          class="mr-0 mr-sm-16"
+          mat-icon-button
+          [routerLink]="'/coordinators'"
+        >
+          <mat-icon>arrow_back</mat-icon>
+        </button>
+        <div
+          class="mr-8 mr-sm-16"
+          *fuseIfOnDom
+          [@animate]="{ value: '*', params: { delay: '50ms', scale: '0.2' } }"
+        >
+          <img
+            [src]="'assets/images/avatars/building.png'"
+            height="24px"
+            width="24px"
+          />
+        </div>
+
+        <div
+          fxLayout="column"
+          fxLayoutAlign="start start"
+          *fuseIfOnDom
+          [@animate]="{ value: '*', params: { delay: '100ms', x: '-25px' } }"
+        >
+          <div class="h2" *ngIf="pageType === 'edit'"></div>
+          <div class="h2" *ngIf="pageType === 'add_zone'">
+            Add New Zone
+          </div>
+          <div class="subtitle secondary-text">
+            <span>Zone Detail</span>
+          </div>
+        </div>
+      </div>
+      <button
+        mat-raised-button
+        class="save-product-button mat-white-bg mt-16 mt-sm-0"
+        [disabled]="zoneForm.invalid || isSaving"
+        *ngIf="pageType === 'add_zone'"
+        (click)="addZone()"
+      >
+        <span>ADD</span>
+      </button>
+      <button
+        mat-raised-button
+        class="save-product-button mat-white-bg mt-16 mt-sm-0"
+        [disabled]="ZoneForm.invalid || ZoneForm.pristine"
+        *ngIf="pageType === 'edit'"
+        (click)="saveCoordinator()"
+      >
+        <span>SAVE</span>
+      </button>
+    </div>
+    <div class="content-card mat-white-bg">
+      <mat-progress-bar
+        mode="indeterminate"
+        [color]="'warn'"
+        *ngIf="isSaving"
+      ></mat-progress-bar>
+      <div class="content">
+        <form
+          name="zoneForm"
+          [formGroup]="zoneForm"
+          class="product w-100-p"
+          fxLayout="column"
+          fxFlex
+        >
+          <mat-tab-group>
+            <mat-tab label="Zone Info" *ngIf="pageType === 'add_zone'">
+              <div class="tab-content p-24" fusePerfectScrollbar>
+                <mat-form-field class="w-100-p">
+                  <input
+                    matInput
+                    name="zonename"
+                    [(ngModel)]="zonename"
+                    placeholder="Zone Name"
+                    formControlName="zone_name"
+                  />
+                </mat-form-field>
+                <mat-form-field class="w-100-p">
+                  <textarea
+                    matInput
+                    name="description"
+                    [(ngModel)]="description"
+                    formControlName="zone_description"
+                    placeholder="Zone Description"
+                    rows="5"
+                  >
+                  </textarea>
+                </mat-form-field>
+              </div>
+            </mat-tab>
+          </mat-tab-group>
+        </form>
+        <div class="tab-content w-60-p p-24" fxLayout="column">
+          <div id="mapView" class="w-100-p h-600"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

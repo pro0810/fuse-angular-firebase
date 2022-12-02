@@ -1,0 +1,113 @@
+<div class="dialog-content-wrapper">
+  <mat-toolbar matDialogTitle class="emg-color-bg m-0">
+    <mat-toolbar-row fxLayout="row" fxLayoutAlign="space-between center">
+      <span class="title dialog-title">{{ dialogTitle }}</span>
+      <button
+        mat-icon-button
+        (click)="matDialogRef.close()"
+        aria-label="Close dialog"
+        class="dialog-title"
+      >
+        <mat-icon>close</mat-icon>
+      </button>
+    </mat-toolbar-row>
+
+    <mat-toolbar-row
+      class="toolbar-bottom py-16"
+      fxLayout="column"
+      fxLayoutAlign="center center"
+    >
+      <input
+        hidden
+        type="file"
+        (change)="onFileChange($event)"
+        accept="image/*"
+        #fileInput
+      />
+      <img
+        [src]="
+          (account.id | coordinator | async)?.photo ||
+          'assets/images/avatars/profile.jpg'
+        "
+        class="avatar contact-avatar huge m-0"
+        [alt]="account.name"
+        (click)="fileInput.click()"
+        style="cursor: pointer;"
+      />
+
+      <!-- Material Spinner -->
+      <div *ngIf="isUploading" class="spinner-wrapper">
+        <div class="spinner">
+          <div class="inner">
+            <div class="gap"></div>
+            <div class="left">
+              <div class="half-circle"></div>
+            </div>
+            <div class="right">
+              <div class="half-circle"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="contact-name mt-8">{{ account.name }}</div>
+    </mat-toolbar-row>
+  </mat-toolbar>
+
+  <div mat-dialog-content class="p-24 m-0" fusePerfectScrollbar>
+    <form [formGroup]="accountForm">
+      <div class="mb-24" fxLayout="row" fxLayoutAlign="start start">
+        <mat-form-field fxFlex>
+          <mat-icon matPrefix class="mr-12 s-20 secondary-text"
+            >account_circle</mat-icon
+          >
+          <input
+            name="name"
+            formControlName="name"
+            placeholder="Name"
+            matInput
+            required
+          />
+        </mat-form-field>
+      </div>
+
+      <!-- <div class="mb-24" fxLayout="row" fxLayoutAlign="start start" >
+                <mat-form-field fxFlex>
+                    <mat-icon matPrefix class="mr-12 s-20 secondary-text">phone</mat-icon>
+                    <input formControlName="phone" matInput placeholder="Phone number">
+                </mat-form-field>
+            </div> -->
+
+      <div class="mb-24" fxLayout="row" fxLayoutAlign="start start">
+        <mat-form-field fxFlex>
+          <mat-icon matPrefix class="mr-12 s-20 secondary-text">email</mat-icon>
+          <input
+            name="email"
+            value="{{ account.email }}"
+            matInput
+            type="email"
+            placeholder="Email"
+            disabled
+          />
+        </mat-form-field>
+      </div>
+    </form>
+  </div>
+
+  <div
+    mat-dialog-actions
+    class="m-0 p-16"
+    fxLayout="row"
+    fxLayoutAlign="space-between center"
+  >
+    <button
+      mat-raised-button
+      (click)="onSave()"
+      class="save-button emg-button"
+      [disabled]="accountForm.invalid"
+      aria-label="SAVE"
+    >
+      SAVE
+    </button>
+  </div>
+</div>

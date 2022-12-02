@@ -1,0 +1,55 @@
+<!-- SIDENAV HEADER -->
+<div class="sidenav-header" *ngIf="contact">
+  <!-- CONTACT TOOLBAR -->
+  <mat-toolbar class="emg-color-bg">
+    <!-- TOOLBAR TOP -->
+    <mat-toolbar-row fxLayout="row" fxLayoutAlign="space-between center">
+      <div>Contact Info</div>
+
+      <button
+        mat-button
+        class="mat-icon-button"
+        fuseMatSidenavToggler="chat-right-sidenav"
+        aria-label="close"
+      >
+        <mat-icon>close</mat-icon>
+      </button>
+    </mat-toolbar-row>
+    <!-- / TOOLBAR TOP -->
+
+    <!-- TOOLBAR BOTTOM -->
+    <mat-toolbar-row
+      class="toolbar-bottom"
+      fxLayout="column"
+      fxLayoutAlign="center center"
+    >
+      <img
+        [src]="contact.photo || 'assets/images/avatars/profile.jpg'"
+        class="avatar contact-avatar huge"
+        alt="{{ contact.name }}"
+      />
+
+      <div class="contact-name my-8">{{ contact.name }}</div>
+    </mat-toolbar-row>
+    <!-- / TOOLBAR BOTTOM -->
+  </mat-toolbar>
+  <!-- / CONTACT TOOLBAR -->
+</div>
+
+<!-- SIDENAV CONTENT -->
+<div class="sidenav-content p-16" fusePerfectScrollbar fxFlex *ngIf="contact">
+  <!-- CONTACT INFO -->
+  <mat-card>
+    <mat-form-field fxFlex>
+      <input
+        matInput
+        placeholder="Phone"
+        name="phone"
+        [value]="(contact.id | user | async)?.phone"
+        rows="3"
+        disabled
+      />
+    </mat-form-field>
+  </mat-card>
+  <!-- / CONTACT INFO -->
+</div>

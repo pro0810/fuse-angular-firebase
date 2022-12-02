@@ -1,0 +1,144 @@
+:host {
+  display: flex;
+  flex: 1 0 auto;
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.8) 0%,
+    rgba(255, 255, 255, 0.6) 20%,
+    rgba(255, 255, 255, 0.8)
+  );
+  overflow: hidden;
+  max-width: 100%;
+
+  .chat {
+    .chat-toolbar {
+      min-height: 64px;
+      background-color: #f3f4f5;
+      color: rgba(0, 0, 0, 0.87);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+
+      .responsive-chats-button {
+        padding: 0;
+      }
+
+      .chat-contact {
+        cursor: pointer;
+
+        .avatar {
+          margin-right: 16px;
+        }
+
+        .chat-contact-name {
+          //TODO
+        }
+      }
+    }
+
+    #chat-content {
+      background: transparent;
+      overflow: auto;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+
+      .chat-messages {
+        overflow: auto;
+      }
+
+      .message-row {
+        padding: 16px;
+
+        .bubble {
+          position: relative;
+          padding: 6px 7px 8px 9px;
+          background-color: #fff;
+          box-shadow: 0 1px 0.5px rgba(0, 0, 0, 0.13);
+          border-radius: 6px;
+
+          &:before {
+            background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAmCAMAAADp2asXAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAADGUExURQAAAP////b29vn5+f///wAAAP///wAAAAAAAP///9ra2v////j4+PHx8fv7++Hh4fHx8f////////////////39/QAAAP////////z8/P////39/f39/fz8/P////////////z8/P////////////z8/P////////////v7+/Hx8f///9bW1vz8/K2trf////39/f39/WJiYgAAAExMTFtbWwAAAN3d3cjIyPr6+vX19QAAAO7u7vz8/NTU1Ofn5zMzM////zGPlXsAAABBdFJOUwAcm/kREh4CCDWL1SneR6TfAQffhMYK/A5nRrLWfRc5DW2ih5f+19Kn+9v4g/1LCJuXHwQUKgahcXS6DNnlDMMKKzPoTgAAAKBJREFUKM+V08USwmAQA+C/0NIWd3d3d8/7vxTMcIPkQK7f7CG7s8bQAOY/SCuwFYQU1P+eiCqIK2gpWCmoCrAgoKQgJ8CHgIqAMjg0MxxSQ3DogEMWFBZtUPAHYGB1CyDQWE6AH7BrfXzlAxGAQhECTGAmwN1Okz0Gb/LW4fEItIfrOfNELMh3tck7u+PhcT2zQ7l77/K8iY8yJwV3BeYFqpc/uSyPGdAAAAAASUVORK5CYII=);
+            content: "";
+            position: absolute;
+            left: -11px;
+            bottom: 3px;
+            width: 12px;
+            height: 19px;
+            background-position: 50% 50%;
+            background-repeat: no-repeat;
+            background-size: contain;
+          }
+
+          .message {
+            white-space: pre-wrap;
+          }
+
+          .time {
+            font-size: 11px;
+            margin-top: 8px;
+            text-align: right;
+          }
+        }
+
+        &.contact {
+          .avatar {
+            margin: 0 16px 0 0;
+          }
+        }
+
+        &.user {
+          align-items: flex-end;
+
+          .avatar {
+            order: 2;
+            margin: 0 0 0 16px;
+          }
+
+          .bubble {
+            margin-left: auto;
+            background-color: #e8f5e9;
+            border: 1px solid #dfebe0;
+            order: 1;
+            &:before {
+              right: -11px;
+              left: auto;
+              background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAmCAMAAADp2asXAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAD2UExURQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGRsXAAAANzwzNPmxNrtyau5oIWRedDkwNntyczgwdfpyJ+/n97wzsLWtNjsytvwzczfvtPmxau6nNjqxtrtyio1KtzwzNjryAAAANzwzgAAANzwzK7Aor/Us9Lnw8vevAAAAMzevtbpxrvMrX+IdwAAAEROOi45Lr3MrZGjf9LoxX+MctnqydLkwhgYGMzfv9vuyQAAANzwzNvuy9zxy7vMu7XGqNvtzKKykwAAANruzKq6nLnMriQkGMXXuL3PsNjsySgzKAAAANLkw83fvd3vy9z4xtzwzRpFmIEAAABQdFJOUwAXChEGBAMBAgwhDvJ7k0YqMc0Zmwj6apf2kjU0+dkw/swh/CP9j2Wr2gndvaYeBRoxQg6gUPt/FaHJGdTj9A9k7XQLeE6iFcN12xkSt9r4NKizowAAAMFJREFUKM+V0sdywlAMBVDbMX7PQCihQ+iQ0HsJvfem/P/PwBIzugu0PXNnNNJVyPmhsIPhhoB2COwIGuLdhAcl3AhCBoBoHUC6BCBbA0C/EkBFB5D/FjxQwQYg1RI8UKINgDoSAPUlAPqUAMgfAEBfXsEDBV0+Hogi4Zhg4THj9YwHoqEBYOrgYTI3GVgMNn8r+Qq94k9yZNosW/3Hy9VuTjWfHkOX6367bGZUU7de66ieHZrO1OGg8Z1WTgYAFLgD5S1PCkzo1B0AAAAASUVORK5CYII=);
+            }
+          }
+        }
+      }
+    }
+
+    .chat-footer {
+      min-height: 64px;
+      max-height: 96px;
+      background-color: #f3f4f5;
+      color: rgba(0, 0, 0, 0.87);
+      border-top: 1px solid rgba(0, 0, 0, 0.08);
+      padding: 8px 8px 8px 16px;
+
+      .reply-form {
+        mat-form-field {
+          margin: 0;
+          padding-right: 16px;
+
+          textarea {
+            overflow: auto;
+            max-height: 80px;
+            transition: height 200ms ease;
+            &.grow {
+              height: 80px;
+            }
+          }
+
+          .mat-errors-spacer {
+            display: none;
+          }
+        }
+
+        .mat-button {
+          margin: 0;
+        }
+      }
+    }
+  }
+}
